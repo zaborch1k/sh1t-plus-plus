@@ -2,7 +2,8 @@ import sys
 import lex
 import parcer as yacc
 
-# лексер
+# лексер 
+print('sdfsdf')
 keywords = (
     "SET",
     'RIGHT',
