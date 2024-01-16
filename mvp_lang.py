@@ -126,8 +126,7 @@ def p_command_empty(p): # тоже временно, без этого выле�
 
 
 def p_command_set(p):
-    '''command : SET ID EQUALS expr NEWLINE
-               | SET ID EQUALS expr '''
+    '''command : SET ID EQUALS expr NEWLINE'''
     p[0] = (p[1], p[2], p[4])
 
 
@@ -155,11 +154,9 @@ def p_fact_number(p):
     "fact : NUMBER"
     p[0] = ("num", p[1])
 
-
 def p_fact_var(p):
     "fact : ID"
     p[0] = ("var", p[1])
-
 
 def p_fact_paren(p):
     "fact : LPAREN expr RPAREN"
@@ -167,10 +164,7 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    if p:
-        print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
-    else:
-        print('p = None')
+    print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
 
 parser = yacc.yacc()
 # to execute parse
