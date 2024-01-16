@@ -2,8 +2,7 @@ import sys
 import lex
 import parcer as yacc
 
-# лексер 
-print('sdfsdf')
+# лексер
 keywords = (
     "SET",
     'RIGHT',
@@ -40,7 +39,7 @@ def t_ID(t):
     r"[a-zA-Z][a-zA-Z]*"
     if t.value in keywords:
         t.type = t.value
-        return t
+    return t
 
 t_PLUS    = r"\+"
 t_MINUS   = r"-"
@@ -127,12 +126,10 @@ def p_command_empty(p): # тоже временно, без этого выле�
 
 
 def p_command_set(p):
-    '''command : SET ID EQUALS expr NEWLINE'''
+    '''command : SET ID EQUALS expr NEWLINE
+               | SET ID EQUALS expr '''
     p[0] = (p[1], p[2], p[4])
 
-def p_comand_set_error(p):
-    '''command : SET ID EQUALS expr error NEWLINE'''
-    p[0] = 'Unexpended symbol in SET expression'
 
 def p_expr(p):
     '''expr : expr PLUS factor
@@ -168,7 +165,10 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
+    if p:
+        print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
+    else:
+        print('p = None')
 
 parser = yacc.yacc()
 # to execute parse
@@ -179,3 +179,47 @@ with open(sys.argv[1]) as file:
         r = yacc.parse(line, lexer=lexer)
         if r:
             print(f"  {r}")
+
+"""
+
+# execute the prog
+vars = {}
+
+
+def evaluate_statement(s):
+  if s["op"] == "set":
+    vars[s["var"]] = evaluate(s["value"])
+  elif s["op"] == "print":
+    print(evaluate(s["value"]))
+  elif s["op"] == "read":
+    vars[s["var"]] = float(input("Enter a number: "))
+  elif s["op"] == "ignore":
+    pass
+  else:
+    raise Exception(f"Unknown statement type {s['op']}")
+
+
+def evaluate(expr):
+  if expr["op"] == "+":
+    return evaluate(expr["left"]) + evaluate(expr["right"])
+  elif expr["op"] == "-":
+    return evaluate(expr["left"]) - evaluate(expr["right"])
+  elif expr["op"] == "*":
+    return evaluate(expr["left"]) * evaluate(expr["right"])
+  elif expr["op"] == "/":
+    return evaluate(expr["left"]) / evaluate(expr["right"])
+  elif expr["op"] == "number":
+    return expr["value"]
+  elif expr["op"] == "var":
+    return vars[expr["value"]]
+  else:
+    raise Exception(f"Unknown expression type {expr['op']}")
+
+# read file with prog
+
+
+with open(sys.argv[1]) as file:
+  while line := file.readline():
+    r = yacc.parse(line, lexer=lexer)
+    evaluate_statement(r)
+"""
