@@ -9,25 +9,25 @@ import inspect
 StringTypes = (str, bytes)
 
 # This regular expression is used to match valid token names
-_is_identifier = re.compile(r'^[a-zA-Z0-9_]+$')
+is_identifier = re.compile(r'^[a-zA-Z0-9]+$')
 
 # Exception thrown when invalid token encountered and no default error
 # handler is defined.
 class LexError(Exception):
-    def __init__(self, message, s):
+    def _init_(self, message, s):
         self.args = (message,)
         self.text = s
 
 # Token class.  This class is used to represent the tokens produced.
 class LexToken(object):
-    def __repr__(self):
+    def _repr_(self):
         return f'LexToken({self.type},{self.value!r},{self.lineno},{self.lexpos})'
 
 # This object is a stand-in for a logging object created by the
 # logging module.
 
 class PlyLogger(object):
-    def __init__(self, f):
+    def _init_(self, f):
         self.f = f
 
     def critical(self, msg, *args, **kwargs):
@@ -57,7 +57,7 @@ class PlyLogger(object):
 # -----------------------------------------------------------------------------
 
 class Lexer:
-    def __init__(self):
+    def _init_(self):
         self.lexre = None             # Master regular expression. This is a list of
                                       # tuples (re, findex) where re is a compiled
                                       # regular expression and findex is a list
@@ -101,13 +101,13 @@ class Lexer:
                         if not f or not f[0]:
                             newfindex.append(f)
                             continue
-                        newfindex.append((getattr(object, f[0].__name__), f[1]))
+                        newfindex.append((getattr(object, f[0]._name_), f[1]))
                 newre.append((cre, newfindex))
                 newtab[key] = newre
             c.lexstatere = newtab
             c.lexstateerrorf = {}
             for key, ef in self.lexstateerrorf.items():
-                c.lexstateerrorf[key] = getattr(object, ef.__name__)
+                c.lexstateerrorf[key] = getattr(object, ef._name_)
             c.lexmodule = object
         return c
 
@@ -269,10 +269,10 @@ class Lexer:
         return None
 
     # Iterator interface
-    def __iter__(self):
+    def _iter_(self):
         return self
 
-    def __next__(self):
+    def _next_(self):
         t = self.token()
         if t is None:
             raise StopIteration
@@ -292,7 +292,7 @@ class Lexer:
 # or as a .regex attribute attached by the @TOKEN decorator.
 # -----------------------------------------------------------------------------
 def _get_regex(func):
-    return getattr(func, 'regex', func.__doc__)
+    return getattr(func, 'regex', func._doc_)
 
 # -----------------------------------------------------------------------------
 # get_caller_module_dict()
@@ -375,7 +375,7 @@ def _statetoken(s, names):
 # user's input file.
 # -----------------------------------------------------------------------------
 class LexerReflect(object):
-    def __init__(self, ldict, log=None, reflags=0):
+    def _init_(self, ldict, log=None, reflags=0):
         self.ldict      = ldict
         self.error_func = None
         self.tokens     = []
@@ -504,7 +504,7 @@ class LexerReflect(object):
             states, tokname = _statetoken(f, self.stateinfo)
             self.toknames[f] = tokname
 
-            if hasattr(t, '__call__'):
+            if hasattr(t, '_call_'):
                 if tokname == 'error':
                     for s in states:
                         self.errorf[s] = t
@@ -512,9 +512,9 @@ class LexerReflect(object):
                     for s in states:
                         self.eoff[s] = t
                 elif tokname == 'ignore':
-                    line = t.__code__.co_firstlineno
-                    file = t.__code__.co_filename
-                    self.log.error("%s:%d: Rule %r must be defined as a string", file, line, t.__name__)
+                    line = t._code_.co_firstlineno
+                    file = t._code_.co_filename
+                    self.log.error("%s:%d: Rule %r must be defined as a string", file, line, t._name_)
                     self.error = True
                 else:
                     for s in states:
@@ -538,7 +538,7 @@ class LexerReflect(object):
 
         # Sort the functions by line number
         for f in self.funcsym.values():
-            f.sort(key=lambda x: x[1].__code__.co_firstlineno)
+            f.sort(key=lambda x: x[1]._code_.co_firstlineno)
 
         # Sort the strings by regular expression length
         for s in self.strsym.values():
@@ -550,8 +550,8 @@ class LexerReflect(object):
             # Validate all rules defined by functions
 
             for fname, f in self.funcsym[state]:
-                line = f.__code__.co_firstlineno
-                file = f.__code__.co_filename
+                line = f._code_.co_firstlineno
+                file = f._code_.co_filename
                 module = inspect.getmodule(f)
                 self.modules.add(module)
 
@@ -560,31 +560,31 @@ class LexerReflect(object):
                     reqargs = 2
                 else:
                     reqargs = 1
-                nargs = f.__code__.co_argcount
+                nargs = f._code_.co_argcount
                 if nargs > reqargs:
-                    self.log.error("%s:%d: Rule %r has too many arguments", file, line, f.__name__)
+                    self.log.error("%s:%d: Rule %r has too many arguments", file, line, f._name_)
                     self.error = True
                     continue
 
                 if nargs < reqargs:
-                    self.log.error("%s:%d: Rule %r requires an argument", file, line, f.__name__)
+                    self.log.error("%s:%d: Rule %r requires an argument", file, line, f._name_)
                     self.error = True
                     continue
 
                 if not _get_regex(f):
-                    self.log.error("%s:%d: No regular expression defined for rule %r", file, line, f.__name__)
+                    self.log.error("%s:%d: No regular expression defined for rule %r", file, line, f._name_)
                     self.error = True
                     continue
 
                 try:
                     c = re.compile('(?P<%s>%s)' % (fname, _get_regex(f)), self.reflags)
                     if c.match(''):
-                        self.log.error("%s:%d: Regular expression for rule %r matches empty string", file, line, f.__name__)
+                        self.log.error("%s:%d: Regular expression for rule %r matches empty string", file, line, f._name_)
                         self.error = True
                 except re.error as e:
-                    self.log.error("%s:%d: Invalid regular expression for rule '%s'. %s", file, line, f.__name__, e)
+                    self.log.error("%s:%d: Invalid regular expression for rule '%s'. %s", file, line, f._name_, e)
                     if '#' in _get_regex(f):
-                        self.log.error("%s:%d. Make sure '#' in rule %r is escaped with '\\#'", file, line, f.__name__)
+                        self.log.error("%s:%d. Make sure '#' in rule %r is escaped with '\\#'", file, line, f._name_)
                     self.error = True
 
             # Validate all rules defined by strings
@@ -619,8 +619,8 @@ class LexerReflect(object):
             efunc = self.errorf.get(state, None)
             if efunc:
                 f = efunc
-                line = f.__code__.co_firstlineno
-                file = f.__code__.co_filename
+                line = f._code_.co_firstlineno
+                file = f._code_.co_filename
                 module = inspect.getmodule(f)
                 self.modules.add(module)
 
@@ -628,13 +628,13 @@ class LexerReflect(object):
                     reqargs = 2
                 else:
                     reqargs = 1
-                nargs = f.__code__.co_argcount
+                nargs = f._code_.co_argcount
                 if nargs > reqargs:
-                    self.log.error("%s:%d: Rule %r has too many arguments", file, line, f.__name__)
+                    self.log.error("%s:%d: Rule %r has too many arguments", file, line, f._name_)
                     self.error = True
 
                 if nargs < reqargs:
-                    self.log.error("%s:%d: Rule %r requires an argument", file, line, f.__name__)
+                    self.log.error("%s:%d: Rule %r requires an argument", file, line, f._name_)
                     self.error = True
 
         for module in self.modules:
@@ -655,7 +655,7 @@ class LexerReflect(object):
             return
 
         fre = re.compile(r'\s*def\s+(t_[a-zA-Z_0-9]*)\(')
-        sre = re.compile(r'\s*(t_[a-zA-Z_0-9]*)\s*=')
+        sre = re.compile(r'\s*(t_[a-zA-Z_0-9])\s=')
 
         counthash = {}
         linen += 1
@@ -704,9 +704,9 @@ def lex(*, module=None, object=None, debug=False,
     if module:
         _items = [(k, getattr(module, k)) for k in dir(module)]
         ldict = dict(_items)
-        # If no __file__ attribute is available, try to obtain it from the __module__ instead
-        if '__file__' not in ldict:
-            ldict['__file__'] = sys.modules[ldict['__module__']].__file__
+        # If no _file_ attribute is available, try to obtain it from the _module_ instead
+        if '_file_' not in ldict:
+            ldict['_file'] = sys.modules[ldict['module']].file_
     else:
         ldict = get_caller_module_dict(2)
 
@@ -858,7 +858,7 @@ def runmain(lexer=None, data=None):
 
 def TOKEN(r):
     def set_regex(f):
-        if hasattr(r, '__call__'):
+        if hasattr(r, '_call_'):
             f.regex = _get_regex(r)
         else:
             f.regex = r

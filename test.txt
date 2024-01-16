@@ -1,1 +1,2 @@
-SET X = 6
+SET X = 8
+SET X = 3 - 2
