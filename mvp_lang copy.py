@@ -2,8 +2,7 @@ import sys
 import lex
 import parcer as yacc
 
-# лексер 
-print('sdfsdf')
+# лексер
 keywords = (
     "SET",
     'RIGHT',
@@ -40,7 +39,7 @@ def t_ID(t):
     r"[a-zA-Z][a-zA-Z]*"
     if t.value in keywords:
         t.type = t.value
-        return t
+    return t
 
 t_PLUS    = r"\+"
 t_MINUS   = r"-"
@@ -78,7 +77,7 @@ lexer = lex.lex()
 lexer.lineno = 0
 
 # посмотреть на работу лексера
-
+'''
 with open(sys.argv[1]) as file:
     while line := file.readline():
         print(f"Line: {line}", end="")
@@ -88,7 +87,7 @@ with open(sys.argv[1]) as file:
         if not tok:
             break
         print(f"  {tok}")
-
+'''
 
 # парсер
 
@@ -116,9 +115,13 @@ def p_command_ifblock(p):
 # у command в конце временно NEWLINE, потом будет отдельное правило '''line : command NEWLINE'''
 def p_command_dir(p):
     '''command : RIGHT expr NEWLINE
-           | LEFT expr NEWLINE
-           | UP expr NEWLINE
-           | DOWN expr NEWLINE'''
+               | RIGHT expr
+               | LEFT expr NEWLINE
+               | LEFT expr
+               | UP expr NEWLINE
+               | UP expr
+               | DOWN expr NEWLINE
+               | DOWN expr'''
     p[0] = (p[1], p[2])
 
 def p_command_empty(p): # тоже временно, без этого вылезает SyntaxError : \n
@@ -127,12 +130,10 @@ def p_command_empty(p): # тоже временно, без этого выле�
 
 
 def p_command_set(p):
-    '''command : SET ID EQUALS expr NEWLINE'''
+    '''command : SET ID EQUALS expr NEWLINE
+               | SET ID EQUALS expr'''
     p[0] = (p[1], p[2], p[4])
 
-def p_comand_set_error(p):
-    '''command : SET ID EQUALS expr error NEWLINE'''
-    p[0] = 'Unexpended symbol in SET expression'
 
 def p_expr(p):
     '''expr : expr PLUS factor
@@ -173,9 +174,10 @@ def p_error(p):
 parser = yacc.yacc()
 # to execute parse
 
-with open(sys.argv[1]) as file:
-    while line := file.readline():
-        print(f"Line: {line}", end="")
-        r = yacc.parse(line, lexer=lexer)
-        if r:
-            print(f"  {r}")
+def do_parse(file):
+    with open(file) as file:
+        while line := file.readline():
+            print(f"Line: {line}", end="")
+            r = yacc.parse(line, lexer=lexer)
+            if r:
+                print(f"  {r}")
