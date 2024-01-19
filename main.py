@@ -1,4 +1,4 @@
-import arcade
+import pack.arcade as arcade
 import threading
 import tkinter as tk
 import tkinter.filedialog as tfd
