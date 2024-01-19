@@ -1,7 +1,4 @@
-SET X = 8
-SET X = 3 - 2
-DOWN -3
-DOWN (X + 3) * 4
-
+IFBLOCK RIGHT
+    1 + 3
 
 

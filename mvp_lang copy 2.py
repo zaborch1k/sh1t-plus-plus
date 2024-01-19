@@ -15,8 +15,6 @@ keywords = (
     'PROCEDURE',
     'ENDPROC',
     'CALL',
-    'INDENT',
-    'DEDENT'
 )
 
 tokens = keywords + (
@@ -30,7 +28,9 @@ tokens = keywords + (
     "RPAREN",
     "TIMES",
     'NEWLINE',
-    # чтобы обрабатывать отступы?,
+    # чтобы обрабатывать отступы?
+    'IDENT',
+    'DEPEND',
     'WS'
 )
 
@@ -63,7 +63,7 @@ def t_newline(t):
 
 
 def t_ignor(t):
-    r'\n[ ]+'
+    r'[ \n]+'
     pass
 
 
@@ -75,97 +75,6 @@ def t_error(t):
 lexer = lex.lex()
 lexer.lineno = 0
 
-class IndentLexer:
-    def __init__(self, lexer):
-        self.lexer = lexer
-        self.tok = None
-        self.data = None
-
-    def input(self, data):
-        self.lexer.input(data)
-
-    def token(self):
-        if self.tok is None:
-            self.tok = self._token()
-
-        try:
-            return next(self.tok)
-        except StopIteration:
-            return None
-
-    def empty_tok(self):
-        tok = LexToken()
-        (tok.type,
-         tok.value,
-         tok.lineno,
-         tok.lexpos) = ('', '', 0, 0)
-
-        return tok
-
-    def logical_lines(self):
-        for t in self.lexer:
-            tokens = []
-            indent = 0
-
-            while t.type != 'NEWLINE':
-                if t.type != 'WS':
-                    tokens.append(t)
-                elif not tokens:
-                    indent = len(t.value)
-                t = self.lexer.token()
-            tokens.append(t)
-
-            if len(tokens) == 1 and tokens[0].type == 'NEWLINE':
-                continue
-
-            if tokens:
-                yield tokens, indent
-        yield 'EOF', 0
-
-    def __iter__(self):
-        return self._token()
-
-    def _token(self):
-        indent_stack = [0]
-
-        for tokens, indent in self.logical_lines():
-            indent = indent
-            indent_tok = self.empty_tok()
-
-            # EOF에 도달하면 가장 처음 레벌(indent=0)으로 돌아가서 끝낸다.
-            if tokens == 'EOF':
-                while len(indent_stack) > 1:
-                    indent_tok.type = 'DEDENT'
-                    indent_stack.pop()
-                    yield indent_tok
-                break
-
-            last_indent = indent_stack[-1]
-
-            if last_indent < indent:
-                indent_stack.append(indent)
-                indent_tok.type = 'INDENT'
-
-                # INDENT 토큰 발행
-                yield indent_tok
-            elif last_indent > indent:
-                indent_tok.type = 'DEDENT'
-                while indent_stack[-1] > indent:
-                    indent_stack.pop()
-                    # DEDENT 토큰 발행
-                    yield indent_tok
-                if indent_stack[-1] != indent:
-                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.")
-
-            # 나머지 토큰 발행
-            yield from tokens
-
-lexer = IndentLexer(lexer)
-
-def fread(file):
-    with open(file) as f:
-        global s_file
-        s_file = f.read()
 
 # парсер
 
@@ -217,10 +126,6 @@ def p_command_ifblock(p):
     pass
 """
 
-def p_command_ifblock(p):
-    '''command : IFBLOCK RIGHT INDENT expr DEDENT ENDIF'''
-    print('fghfghfgh')
-    p[0] = (p[1], p[2], p[4])
 
 def p_command_dir(p):
     '''command : RIGHT expr
@@ -274,9 +179,10 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-def do_parse():
-    for line in s_file:
-        print(f"Line: {line}", end="")
-        r = yacc.parse(line, lexer=lexer)
-        if r:
-            print(f"  {r}")
+def do_parse(file):
+    with open(file) as file:
+        while line := file.readline():
+            print(f"Line: {line}", end="")
+            r = yacc.parse(line, lexer=lexer)
+            if r:
+                print(f"  {r}")

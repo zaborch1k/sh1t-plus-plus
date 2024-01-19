@@ -1,8 +1,8 @@
 from mvp_lang import *
 import sys
 
-do_parse('test.txt') # убрать это
-
+fread('test.txt')
+do_parse()
 
 class Interp:
     def __init__(self, prog):
