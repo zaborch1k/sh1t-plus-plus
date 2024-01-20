@@ -197,12 +197,6 @@ def p_command_procedure(p):
 def p_command_call(p):
     '''command : CALL ID'''
     p[0] = (p[1], p[2])
-    
-
-def p_block_commands(p):
-    '''block : ''' # Есть идея группировать код с одинаковым кол-вом пробелов (кратным 4)
-                   # в некий 'блок кода'
-
 
 
 def p_command_dir(p):
@@ -268,7 +262,11 @@ def do_parse(file):
 
 print()
 data = '''
-CALL d
+IFBLOCK RIGHT
+    REPEAT 6
+        SET X = 8
+    ENDREPEAT
+ENDIF
 '''
 lexer = IndentLex(lexer)
 lexer.input(data)
