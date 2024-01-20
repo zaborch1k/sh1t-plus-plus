@@ -1,12 +1,12 @@
-from mvp_lang import *
+from mvp_lang_copy_2 import *
 import sys
 
-fread('test.txt')
-do_parse()
+#do_parse('test.txt')
 
 class Interp:
     def __init__(self, prog):
         self.prog = prog
+        self.error = 0
     
     def eval(self, expr):
         etype = expr[0]
@@ -33,6 +33,7 @@ class Interp:
     def assign(self, target, value):
         var = target
         self.vars[var] = self.eval(value)
+        print('assign {self.vars[var]}')
     
     def run(self):
         self.vars = {}
@@ -41,11 +42,12 @@ class Interp:
         self.stat = list(self.prog)
         self.stat.sort()
         self.pc = 0
+        
 
         if self.error:
             raise RuntimeError
     
-        while 0:
+        while 1:
             line = self.stat[self.pc]
             instr = self.prog[line]
 
@@ -60,4 +62,22 @@ class Interp:
                 value = self.eval(instr[1])
                 print('*жосткая связь с графикой*')
                 # отправить op и value
+
+        def new(self):
+            self.prog = {}
         
+
+        def add_statement(self, prog):
+            for line, stat in prog.items():
+                self.prog[line] = stat
+
+
+def parse(file):
+    with open(file) as file:
+        while line := file.readline():
+            r = yacc.parse(line, lexer=lexer)
+            return r
+
+b = Interp(parse('test.txt'))
+b.run()
+

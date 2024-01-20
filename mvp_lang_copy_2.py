@@ -1,4 +1,3 @@
-import sys
 import lex
 import parcer as yacc
 
@@ -28,11 +27,11 @@ tokens = keywords + (
     "PLUS",
     "RPAREN",
     "TIMES",
-    # чтобы обрабатывать отступы вроде
+    'NEWLINE',
+    # чтобы обрабатывать отступы?
     'IDENT',
     'DEPEND',
-    'WS',
-    'NEWLINE'
+    'WS'
 )
 
 def t_ID(t):
@@ -76,22 +75,39 @@ def t_error(t):
 lexer = lex.lex()
 lexer.lineno = 0
 
-# посмотреть на работу лексера
-'''
-with open(sys.argv[1]) as file:
-    while line := file.readline():
-        print(f"Line: {line}", end="")
-        lexer.input(line)
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break
-        print(f"  {tok}")
-'''
+
+
 
 # парсер
 
+def p_program(p):
+    '''program : statement'''
+    if p[1]:
+        p[0] = {}
+        line, stat = p[1]
+        p[0][line] = stat
+
+
+def p_statement(p):
+    '''statement : command NEWLINE
+                 | command'''
+    if len(p) == 2:
+        lexer.lineno += 1
+    lineno = lexer.lineno
+    p[0] = (lineno, p[1])
+
+
+def p_statement_blank(p):
+    '''statement : NEWLINE
+                 |  '''
+    if len(p) == 1:
+        lexer.lineno += 1
+    lineno = lexer.lineno
+    p[0] = (lineno, 'blank',)
+
+
 """
+# просто идеи
 def p_command_repeat(p):
     '''command : REPEAT expr NEWLINE block ENDREPEAT'''
     
@@ -104,7 +120,7 @@ def p_command_call(p):
     
 
 def p_block_commands(p):
-    '''block : ''' # пока не знаю, как сделать. Есть идея группировать код с одинаковым кол-вом пробелов (кратным 4)
+    '''block : ''' # Есть идея группировать код с одинаковым кол-вом пробелов (кратным 4)
                    # в некий 'блок кода'
 
 def p_command_ifblock(p):
@@ -112,26 +128,17 @@ def p_command_ifblock(p):
     pass
 """
 
-# у command в конце временно NEWLINE, потом будет отдельное правило '''line : command NEWLINE'''
+
 def p_command_dir(p):
-    '''command : RIGHT expr NEWLINE
-               | RIGHT expr
-               | LEFT expr NEWLINE
+    '''command : RIGHT expr
                | LEFT expr
-               | UP expr NEWLINE
                | UP expr
-               | DOWN expr NEWLINE
                | DOWN expr'''
     p[0] = (p[1], p[2])
 
-def p_command_empty(p): # тоже временно, без этого вылезает SyntaxError : \n
-    '''command : NEWLINE'''
-    p[0] = None
-
 
 def p_command_set(p):
-    '''command : SET ID EQUALS expr NEWLINE
-               | SET ID EQUALS expr'''
+    '''command : SET ID EQUALS expr'''
     p[0] = (p[1], p[2], p[4])
 
 
@@ -172,7 +179,7 @@ def p_error(p):
     print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
 
 parser = yacc.yacc()
-# to execute parse
+
 
 def do_parse(file):
     with open(file) as file:
@@ -181,3 +188,10 @@ def do_parse(file):
             r = yacc.parse(line, lexer=lexer)
             if r:
                 print(f"  {r}")
+            return r
+
+def pparse(file, lexer=lexer):
+    with open(file) as file:
+        fr = file.read()
+        r = yacc.parse(fr, lexer=lexer)
+        return r

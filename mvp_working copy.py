@@ -1,5 +1,6 @@
 import lex
 import parcer as yacc
+from lex import LexToken
 
 # лексер
 keywords = (
@@ -15,8 +16,6 @@ keywords = (
     'PROCEDURE',
     'ENDPROC',
     'CALL',
-    'INDENT',
-    'DEDENT'
 )
 
 tokens = keywords + (
@@ -30,7 +29,9 @@ tokens = keywords + (
     "RPAREN",
     "TIMES",
     'NEWLINE',
-    # чтобы обрабатывать отступы?,
+    # чтобы обрабатывать отступы?
+    'INDENT',
+    'DEDENT',
     'WS'
 )
 
@@ -47,35 +48,17 @@ t_DIVIDE  = r"/"
 t_EQUALS  = r"="
 t_LPAREN  = r"\("
 t_RPAREN  = r"\)"
+t_WS = r'[^\n\S]+'
+t_NEWLINE = r'\n'
 
-def t_NUMBER(t):
+def t_NUMBER(t): # добавить float
     r"-?\d+"
     t.value = int(t.value)
     return t
 
-
-def t_newline(t):
-    r'\n'
-    t.lexer.lineno += len(t.value)
-    t.lexer.skip(1)
-    t.type = 'NEWLINE'
-    return t
-
-
-def t_ignor(t):
-    r'\n[ ]+'
-    pass
-
-
-def t_error(t):
-    print(f"\nIllegal character {t.value[0]!r} in line {lexer.lineno}") #
-    t.lexer.skip(1)
-
-
 lexer = lex.lex()
-lexer.lineno = 0
 
-class IndentLexer:
+class IndentLex:
     def __init__(self, lexer):
         self.lexer = lexer
         self.tok = None
@@ -155,72 +138,72 @@ class IndentLexer:
                     # DEDENT 토큰 발행
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.")
+                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.") 
 
             # 나머지 토큰 발행
             yield from tokens
-
-lexer = IndentLexer(lexer)
-
-def fread(file):
-    with open(file) as f:
-        global s_file
-        s_file = f.read()
 
 # парсер
 
 def p_program(p):
     '''program : statement'''
     if p[1]:
-        p[0] = {}
-        line, stat = p[1]
-        p[0][line] = stat
+        #p[0] = {}
+        #line, stat = p[1]
+        #p[0][line] = stat
+        p[0] = p[1]
 
+def p_block(p):
+    '''block : NEWLINE INDENT statement DEDENT'''
+    p[0] = p[3]
 
 def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
-    if len(p) == 2:
-        lexer.lineno += 1
-    lineno = lexer.lineno
-    p[0] = (lineno, p[1])
+    #if len(p) == 2:
+     #   lexer.lineno += 1
+   # lineno = lexer.lineno
+    #p[0] = (lineno, p[1])
+    p[0] = (p[1])
 
 
 def p_statement_blank(p):
     '''statement : NEWLINE
                  |  '''
     if len(p) == 1:
-        lexer.lineno += 1
-    lineno = lexer.lineno
-    p[0] = (lineno, 'blank',)
+#        lexer.lineno += 1
+    #lineno = lexer.lineno
+   # p[0] = (lineno, 'blank',)
+        p[0] = ('blank')
+
+def p_command_ifblock(p):
+    '''command : IFBLOCK RIGHT block ENDIF
+               | IFBLOCK DOWN block ENDIF
+               | IFBLOCK UP block ENDIF
+               | IFBLOCK LEFT block ENDIF'''
+    p[0] = (p[1], p[2], p[3])
 
 
-"""
-# просто идеи
 def p_command_repeat(p):
-    '''command : REPEAT expr NEWLINE block ENDREPEAT'''
+    '''command : REPEAT expr block ENDREPEAT'''
+    p[0] = (p[1], p[2], p[3])
     
 
 def p_command_procedure(p):
-    '''command : PROCEDURE ID NEWLINE block ENDPROC'''
+    '''command : PROCEDURE ID block ENDPROC'''
+    p[0] = (p[1], p[2], p[3])
     
+
 def p_command_call(p):
     '''command : CALL ID'''
+    p[0] = (p[1], p[2])
     
 
 def p_block_commands(p):
     '''block : ''' # Есть идея группировать код с одинаковым кол-вом пробелов (кратным 4)
                    # в некий 'блок кода'
 
-def p_command_ifblock(p):
-    'command : IFBLOCK (RIGHT/DOWN/UP/LEft) NEWLINE block NEWLINE ENDIF'
-    pass
-"""
 
-def p_command_ifblock(p):
-    '''command : IFBLOCK RIGHT INDENT expr DEDENT ENDIF'''
-    print('fghfghfgh')
-    p[0] = (p[1], p[2], p[4])
 
 def p_command_dir(p):
     '''command : RIGHT expr
@@ -269,14 +252,28 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    print(f"\nSyntax error {p.value!r} (line:{lexer.lineno})")
+    print(f"\nSyntax error {p.value!r}")
 
 parser = yacc.yacc()
 
 
-def do_parse():
-    for line in s_file:
-        print(f"Line: {line}", end="")
-        r = yacc.parse(line, lexer=lexer)
-        if r:
-            print(f"  {r}")
+def do_parse(file):
+    with open(file) as file:
+        while line := file.readline():
+            print(f"Line: {line}", end="")
+            r = yacc.parse(line, lexer=lexer)
+            if r:
+                print(f"  {r}")
+            return r
+
+print()
+data = '''
+CALL d
+'''
+lexer = IndentLex(lexer)
+lexer.input(data)
+for t in lexer:
+    print(t)
+
+res = parser.parse(data, lexer=lexer)
+print(res)

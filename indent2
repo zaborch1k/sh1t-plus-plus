@@ -1,0 +1,181 @@
+import lex
+from lex import LexToken
+
+import parcer as yacc
+
+tokens = ('ID',
+          'COLON',
+          'WS',
+          'NEWLINE',
+          'INDENT',
+          'DEDENT')
+
+t_ID = r'[a-zA-Z_][a-zA-Z0-9_]*'
+t_COLON = r':'
+t_WS = r'[^\n\S]+'
+t_NEWLINE = r'\n'
+
+lexer = lex.lex()
+
+
+class IndentLexer:
+    def __init__(self, lexer):
+        self.lexer = lexer
+        self.tok = None
+        self.data = None
+
+    def input(self, data):
+        self.lexer.input(data)
+
+    def token(self):
+        if self.tok is None:
+            self.tok = self._token()
+
+        try:
+            return next(self.tok)
+        except StopIteration:
+            return None
+
+    def empty_tok(self):
+        tok = LexToken()
+        (tok.type,
+         tok.value,
+         tok.lineno,
+         tok.lexpos) = ('', '', 0, 0)
+
+        return tok
+
+    def logical_lines(self):
+        for t in self.lexer:
+            tokens = []
+            indent = 0
+
+            while t.type != 'NEWLINE':
+                if t.type != 'WS':
+                    tokens.append(t)
+                elif not tokens:
+                    indent = len(t.value)
+                t = self.lexer.token()
+            tokens.append(t)
+
+            if len(tokens) == 1 and tokens[0].type == 'NEWLINE':
+                continue
+
+            if tokens:
+                yield tokens, indent
+        yield 'EOF', 0
+
+    def __iter__(self):
+        return self._token()
+
+    def _token(self):
+        indent_stack = [0]
+
+        for tokens, indent in self.logical_lines():
+            indent = indent
+            indent_tok = self.empty_tok()
+
+            # EOF에 도달하면 가장 처음 레벌(indent=0)으로 돌아가서 끝낸다.
+            if tokens == 'EOF':
+                while len(indent_stack) > 1:
+                    indent_tok.type = 'DEDENT'
+                    indent_stack.pop()
+                    yield indent_tok
+                break
+
+            last_indent = indent_stack[-1]
+
+            if last_indent < indent:
+                indent_stack.append(indent)
+                indent_tok.type = 'INDENT'
+
+                # INDENT 토큰 발행
+                yield indent_tok
+            elif last_indent > indent:
+                indent_tok.type = 'DEDENT'
+                while indent_stack[-1] > indent:
+                    indent_stack.pop()
+                    # DEDENT 토큰 발행
+                    yield indent_tok
+                if indent_stack[-1] != indent:
+                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.")
+
+            # 나머지 토큰 발행
+            yield from tokens
+
+            # print(f"indent_stack: {indent_stack}",
+            # f"indent: {indent}",
+            # f"tokens: {tokens}",
+            # "", sep='\n')
+
+data = """
+list of:
+ a
+ 
+    b
+    c
+"""
+
+lexer = IndentLexer(lexer)
+
+lexer.input(data)
+
+for t in lexer:
+    print(t)
+
+def p_program(p):
+    '''program : stmts'''
+    p[0] = p[1]
+
+def p_stmts(p):
+    '''stmts : stmts stmt
+             | stmt
+             | NEWLINE'''
+    try:
+        p[0] = p[1] + [p[2]]
+    except IndexError:
+        p[0] = [p[1]]
+
+def p_stmt(p):
+    '''stmt : simple_stmt NEWLINE
+            | compound_stmt'''
+    p[0] = p[1]
+
+def p_simple_stmt(p):
+    '''simple_stmt : expr'''
+    p[0] = p[1]
+
+def p_expr(p):
+    '''expr : id'''
+    p[0] = p[1]
+
+def p_compound_stmt(p):
+    '''compound_stmt : ID ID COLON suite'''
+    p[0] = p[4]
+
+def p_suite(p):
+    '''suite : NEWLINE INDENT stmts DEDENT
+             | simple_stmt NEWLINE '''
+    if len(p) == 3:
+        p[0] = [p[1]]
+    else:
+        p[0] = p[3]
+
+def p_id(p):
+    '''id : ID'''
+    p[0] = p[1]
+
+parser = yacc.yacc()
+
+data = """
+list of:
+    a
+    b
+    c
+    list of:
+      d
+      e
+"""
+res = parser.parse(data, lexer=lexer)
+
+print(res)
