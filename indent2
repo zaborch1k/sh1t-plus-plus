@@ -98,7 +98,7 @@ class IndentLexer:
                     # DEDENT 토큰 발행
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.")
+                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.") 
 
             # 나머지 토큰 발행
             yield from tokens
