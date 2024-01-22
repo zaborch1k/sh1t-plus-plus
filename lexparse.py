@@ -51,7 +51,7 @@ t_RPAREN  = r"\)"
 t_WS = r'[^\n\S]+'
 t_NEWLINE = r'\n'
 
-def t_NUMBER(t): # добавить float
+def t_NUMBER(t):
     r"-?\d+"
     t.value = int(t.value)
     return t
