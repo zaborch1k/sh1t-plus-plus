@@ -151,19 +151,22 @@ def p_program(p):
 
 # "блок программ", ограниченный отступами. 
 # Используется для циклa, определения процедур и условного оператора
+"""
 def p_block(p):
     '''block : NEWLINE INDENT statement DEDENT'''
     p[0] = p[3]
-    print(p[0])
+"""
 
 def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
+    p[0] = (p[1])
+    print(p[0], 'is stmnt')
     #if len(p) == 2:
      #   lexer.lineno += 1
    # lineno = lexer.lineno
     #p[0] = (lineno, p[1])
-    p[0] = (p[1])
+    
 
 
 def p_statement_blank(p):
@@ -175,7 +178,7 @@ def p_statement_blank(p):
    # p[0] = (lineno, 'blank',)
         p[0] = ('blank')
         
-
+"""
 def p_command_ifblock(p):
     '''command : IFBLOCK RIGHT block ENDIF
                | IFBLOCK DOWN block ENDIF
@@ -197,7 +200,7 @@ def p_command_procedure(p):
 def p_command_call(p):
     '''command : CALL ID'''
     p[0] = (p[1], p[2])
-
+"""
 
 def p_command_dir(p):
     '''command : RIGHT expr
@@ -205,6 +208,7 @@ def p_command_dir(p):
                | UP expr
                | DOWN expr'''
     p[0] = (p[1], p[2])
+    print(p[0], 'is command')
 
 
 def p_command_set(p):
@@ -262,9 +266,8 @@ def do_parse(file):
 
 # вот тут вылезает ошибка, если в data больше 1 строки
 data = '''
-RIGHT 6
 SET X = 8
-
+RIGHT 4
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)
