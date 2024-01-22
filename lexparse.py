@@ -261,7 +261,7 @@ def do_parse(file):
                 print(f"  {r}")
             return r
 
-
+# вот тут вылезает ошибка, если в data больше 1 строки
 data = '''
 RIGHT 6
 SET X = 8
