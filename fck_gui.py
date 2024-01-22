@@ -1,3 +1,4 @@
+# графика
 import arcade
 import threading
 import tkinter as tk

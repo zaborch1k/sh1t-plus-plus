@@ -1,3 +1,4 @@
+# файл с лексером и парсером в процессе разработки
 import lex
 import parcer as yacc
 from lex import LexToken
@@ -24,12 +25,11 @@ tokens = keywords + (
     "ID",
     "LPAREN",
     "MINUS",
-    "NUMBER",
+    'NUMBER',
     "PLUS",
     "RPAREN",
     "TIMES",
     'NEWLINE',
-    # чтобы обрабатывать отступы?
     'INDENT',
     'DEDENT',
     'WS'
@@ -56,8 +56,8 @@ def t_NUMBER(t): # добавить float
     t.value = int(t.value)
     return t
 
-lexer = lex.lex()
 
+# второй лексер, для обработки отступов
 class IndentLex:
     def __init__(self, lexer):
         self.lexer = lexer
@@ -114,8 +114,7 @@ class IndentLex:
         for tokens, indent in self.logical_lines():
             indent = indent
             indent_tok = self.empty_tok()
-
-            # EOF에 도달하면 가장 처음 레벌(indent=0)으로 돌아가서 끝낸다.
+            
             if tokens == 'EOF':
                 while len(indent_stack) > 1:
                     indent_tok.type = 'DEDENT'
@@ -129,18 +128,14 @@ class IndentLex:
                 indent_stack.append(indent)
                 indent_tok.type = 'INDENT'
 
-                # INDENT 토큰 발행
                 yield indent_tok
             elif last_indent > indent:
                 indent_tok.type = 'DEDENT'
                 while indent_stack[-1] > indent:
                     indent_stack.pop()
-                    # DEDENT 토큰 발행
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.") 
-
-            # 나머지 토큰 발행
+                    raise IndentationError("unindent") 
             yield from tokens
 
 # парсер
@@ -153,9 +148,13 @@ def p_program(p):
         #p[0][line] = stat
         p[0] = p[1]
 
+
+# "блок программ", ограниченный отступами. 
+# Используется для циклa, определения процедур и условного оператора
 def p_block(p):
     '''block : NEWLINE INDENT statement DEDENT'''
     p[0] = p[3]
+    print(p[0])
 
 def p_statement(p):
     '''statement : command NEWLINE
@@ -165,6 +164,7 @@ def p_statement(p):
    # lineno = lexer.lineno
     #p[0] = (lineno, p[1])
     p[0] = (p[1])
+    print(p[0], 'is sttmnt')
 
 
 def p_statement_blank(p):
@@ -175,6 +175,7 @@ def p_statement_blank(p):
     #lineno = lexer.lineno
    # p[0] = (lineno, 'blank',)
         p[0] = ('blank')
+        
 
 def p_command_ifblock(p):
     '''command : IFBLOCK RIGHT block ENDIF
@@ -248,7 +249,7 @@ def p_fact_paren(p):
 def p_error(p):
     print(f"\nSyntax error {p.value!r}")
 
-parser = yacc.yacc()
+
 
 
 def do_parse(file):
@@ -260,14 +261,19 @@ def do_parse(file):
                 print(f"  {r}")
             return r
 
-print()
+
 data = '''
-CALL d
+RIGHT 6
+SET X = 8
+
 '''
+lexer = lex.lex()
 lexer = IndentLex(lexer)
+print()
 lexer.input(data)
 for t in lexer:
     print(t)
 
+parser = yacc.yacc()
 res = parser.parse(data, lexer=lexer)
 print(res)

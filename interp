@@ -1,0 +1,10 @@
+# попытка сделать интерпретатор
+import sys
+
+class Interp:
+    def __init__(self, prog):
+        self.prog = prog
+
+    def check_loops(self):
+        for pc in range(len):
+            pass
