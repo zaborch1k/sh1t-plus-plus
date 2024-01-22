@@ -115,8 +115,6 @@ class IndentLex:
         for tokens, indent in self.logical_lines():
             indent = indent
             indent_tok = self.empty_tok()
-
-            # EOF에 도달하면 가장 처음 레벌(indent=0)으로 돌아가서 끝낸다.
             if tokens == 'EOF':
                 while len(indent_stack) > 1:
                     indent_tok.type = 'DEDENT'
@@ -129,19 +127,14 @@ class IndentLex:
             if last_indent < indent:
                 indent_stack.append(indent)
                 indent_tok.type = 'INDENT'
-
-                # INDENT 토큰 발행
                 yield indent_tok
             elif last_indent > indent:
                 indent_tok.type = 'DEDENT'
                 while indent_stack[-1] > indent:
                     indent_stack.pop()
-                    # DEDENT 토큰 발행
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent가 다른 어떤 바깥 인덴트 레벨과 맞지 않습니다.") 
-
-            # 나머지 토큰 발행
+                    raise IndentationError("unindent") 
             yield from tokens
 
 # парсер
