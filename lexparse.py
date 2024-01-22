@@ -164,7 +164,6 @@ def p_statement(p):
    # lineno = lexer.lineno
     #p[0] = (lineno, p[1])
     p[0] = (p[1])
-    print(p[0], 'is sttmnt')
 
 
 def p_statement_blank(p):
