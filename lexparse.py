@@ -139,46 +139,28 @@ class IndentLex:
             yield from tokens
 
 # парсер
-
+            
 def p_program(p):
-    '''program : statement'''
+    '''program : program statement'''
     if p[1]:
-        #p[0] = {}
-        #line, stat = p[1]
-        #p[0][line] = stat
-        p[0] = p[1]
+        p[0] = [p[1], p[2]]
+    else:
+        p[0] = p[2]
+        
+def p_program_empty(p):
+    '''program : '''
+    p[0] = []
 
-
-# "блок программ", ограниченный отступами. 
-# Используется для циклa, определения процедур и условного оператора
-"""
 def p_block(p):
     '''block : NEWLINE INDENT statement DEDENT'''
     p[0] = p[3]
-"""
 
 def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
-    p[0] = (p[1])
-    print(p[0], 'is stmnt')
-    #if len(p) == 2:
-     #   lexer.lineno += 1
-   # lineno = lexer.lineno
-    #p[0] = (lineno, p[1])
-    
+    p[0] = p[1]
 
 
-def p_statement_blank(p):
-    '''statement : NEWLINE
-                 |  '''
-    if len(p) == 1:
-#        lexer.lineno += 1
-    #lineno = lexer.lineno
-   # p[0] = (lineno, 'blank',)
-        p[0] = ('blank')
-        
-"""
 def p_command_ifblock(p):
     '''command : IFBLOCK RIGHT block ENDIF
                | IFBLOCK DOWN block ENDIF
@@ -200,7 +182,7 @@ def p_command_procedure(p):
 def p_command_call(p):
     '''command : CALL ID'''
     p[0] = (p[1], p[2])
-"""
+
 
 def p_command_dir(p):
     '''command : RIGHT expr
@@ -208,7 +190,6 @@ def p_command_dir(p):
                | UP expr
                | DOWN expr'''
     p[0] = (p[1], p[2])
-    print(p[0], 'is command')
 
 
 def p_command_set(p):
@@ -254,20 +235,9 @@ def p_error(p):
 
 
 
-
-def do_parse(file):
-    with open(file) as file:
-        while line := file.readline():
-            print(f"Line: {line}", end="")
-            r = yacc.parse(line, lexer=lexer)
-            if r:
-                print(f"  {r}")
-            return r
-
-# вот тут вылезает ошибка, если в data больше 1 строки
 data = '''
-SET X = 8
-RIGHT 4
+SET X = 5
+RIGHT 3
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)
