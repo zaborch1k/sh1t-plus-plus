@@ -118,7 +118,7 @@ class Interp:
             self.pc += 1
             print(self.pc) # 
         
-prog = [('SET', 'X', ('binop', '*', ('num', 9), ('num', 0))), ('REPEAT', ('binop', '+', ('binop', '+', ('num', 5), ('num', 3)), ('var', 'X')), ('RIGHT', ('binop', '+', ('num', 4), ('num', 2))))]
+prog = [('RIGHT', ('num', 3)), ('DOWN', ('num', 4))]
 i = Interp(prog)
 try:
     i.run()

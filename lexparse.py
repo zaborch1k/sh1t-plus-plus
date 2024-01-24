@@ -250,9 +250,7 @@ def p_error(p):
 
 
 data = '''
-IFBLOCK RIGHT
-    RIGHT 4
-ENDIF
+RIGHT 4
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)
