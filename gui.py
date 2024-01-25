@@ -8,11 +8,11 @@ import tkinter.messagebox as tmb
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
-SCREEN_TITLE = "Пробник"
+SCREEN_TITLE = "*performing field*"
 
 
 prog_space = tk.Tk()
-prog_space.title("Имя") #тут менять название
+prog_space.title("interp") #тут менять название
 prog_space.geometry("500x500")
 prog_space.resizable(False, False)
 window = None
@@ -29,7 +29,7 @@ def kill_polygon():
     window.performer.center_y = 300 #тута пошали с координатами
 
 def save_file():
-    tmb.showinfo(title="Сохранение файла", message="Ожидайте сохранения файла")
+    tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
     global file_name
     file_name = tfd.asksaveasfilename(filetypes=(("text files", "*.txt"),)) + ".txt"
     content = content_text.get(1.0, "end")
@@ -37,7 +37,7 @@ def save_file():
         bobr.write(content)
 
 def open_file():
-    tmb.showinfo(title="Открытие файла", message="Ожидайте открытия файла")
+    tmb.showinfo(title="*открытие файла*", message="Вы точно хотите открыть новый файл? \n(все несохраненные данные будут УТЕРЯНЫ НАВСЕГДА)")
     global file_name
     file_name = tfd.askopenfilename()
     content_text.delete(1.0, "end")
@@ -62,10 +62,25 @@ open_button.place(x=360, y=20) #если есть неровность поша�
 
 class Performer(arcade.Sprite):
     def __init__(self, window):
-        super().__init__("норм точка.png", 0.5)
+        super().__init__("норм точка.png", 0.1)
+        # один шаг в любую сторону - 47.25
         self.center_x = 250 #тута пошали с координатами
         self.center_y = 250 #тута пошали с координатами
+        #self.change_x = 47.25
+        #self.change_y = 47.25
 
+    def on_update(self, dir, q):
+        # добавить проверку на границы экрана
+        if self.center_x <= 722.5:
+            if dir == 'RIGHT':
+                self.center_x += 47.5 * q
+            elif dir == 'LEFT':
+                self.center_x -= 47.5 * q
+        if dir == 'UP':
+            self.center_y += 47.5 * q
+        elif dir == 'DOWN':
+            self.center_y -= 47.5 * q
+        self.update()
 
 class Polygon(arcade.Window):
     def __init__(self, width, height, title):
@@ -82,11 +97,12 @@ class Polygon(arcade.Window):
                                       self.bg) #тута рисуем фон
         self.performer.draw()
 
-
     def update(self, delta_time: float):
-        self.performer.update()
-
-
+        self.performer.on_update('RIGHT', 3)
+        self.performer.on_update('DOWN', 2)
+        self.performer.on_update('UP', 4)
+        self.performer.on_update('LEFT', 1)
+        
 
 
 prog_space.mainloop()
