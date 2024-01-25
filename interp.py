@@ -1,5 +1,4 @@
 import lexparse
-import sys
 
 class Interp:
     def __init__(self, prog):
@@ -117,7 +116,9 @@ class Interp:
 
             self.pc += 1
             print(self.pc) # 
-        
+
+# only for debugging
+'''
 prog = [('RIGHT', ('num', 3)), ('DOWN', ('num', 4))]
 i = Interp(prog)
 try:
@@ -125,6 +126,7 @@ try:
     raise SystemExit
 except RuntimeError:
     pass
+'''
 
 
 

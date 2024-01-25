@@ -1,3 +1,4 @@
+# for arcade
 import abc
 import collections
 import collections.abc

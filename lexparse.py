@@ -142,29 +142,27 @@ class IndentLex:
 # парсер
             
 def p_program(p):
-    '''program : program statement'''
-    if p[1]:
-        p[0] = [p[1], p[2]]
-    else:
-        p[0] = p[2]
-    """
-    if not p[1]:
-        p[0] = {}
-        line, stat = p[2]
-        p[0][line] = stat
-    else:
+    '''program : program statement
+               | statement
+               | '''
+    if len(p) == 2 and p[1]:
         p[0] = p[1]
-        line, stat = p[2]
-        p[0][line] = stat"""
+    elif p[1]:
+        p[0] = [p[1], p[2]]
 
-        
-def p_program_empty(p):
-    '''program : '''
-    p[0] = []
 
 def p_block(p):
-    '''block : NEWLINE INDENT statement DEDENT'''
-    p[0] = p[3]
+    '''block : NEWLINE INDENT groupstat DEDENT'''
+    p[0] = (p[3])
+
+def p_groupstat(p):
+    '''groupstat : groupstat statement
+                 | '''
+    if len(p) == 3 and p[1]:
+        p[0] = (p[1], p[2])
+    elif len(p) == 3 and p[2]:
+        p[0] = p[2]
+
 
 def p_statement(p):
     '''statement : command NEWLINE
@@ -249,8 +247,10 @@ def p_error(p):
     print(f"\nSyntax error {p.value!r}")
 
 
+# only for debugging
+
 data = '''
-RIGHT 4
+SET X = 3
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)
@@ -263,7 +263,6 @@ parser = yacc.yacc()
 res = parser.parse(data, lexer=lexer)
 print(res)
 
-print('now your turn')
 
 def parse(data, lexer=lexer):
     parser.error = 0
@@ -271,3 +270,4 @@ def parse(data, lexer=lexer):
     if parser.error:
         return None
     return p
+

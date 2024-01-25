@@ -63,6 +63,7 @@ class IndentLex:
         self.lexer = lexer
         self.tok = None
         self.data = None
+        self.lineno = 0
 
     def input(self, data):
         self.lexer.input(data)
@@ -98,7 +99,7 @@ class IndentLex:
                 t = self.lexer.token()
             tokens.append(t)
 
-            if len(tokens) == 1 and tokens[0].type == 'NEWLINE':
+            if tokens[0].type == 'NEWLINE' and len(tokens) == 1:
                 continue
 
             if tokens:
@@ -146,6 +147,16 @@ def p_program(p):
         p[0] = [p[1], p[2]]
     else:
         p[0] = p[2]
+    """
+    if not p[1]:
+        p[0] = {}
+        line, stat = p[2]
+        p[0][line] = stat
+    else:
+        p[0] = p[1]
+        line, stat = p[2]
+        p[0][line] = stat"""
+
         
 def p_program_empty(p):
     '''program : '''
@@ -159,6 +170,10 @@ def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
     p[0] = p[1]
+    """
+    if len(p) == 3:
+        lexer.lineno += 1
+    p[0] = (lexer.lineno, p[1])"""
 
 
 def p_command_ifblock(p):
@@ -234,10 +249,11 @@ def p_error(p):
     print(f"\nSyntax error {p.value!r}")
 
 
-
 data = '''
-SET X = 5
-RIGHT 3
+IFBLOCK RIGHT
+    RIGHT 4
+    RIGHT 4
+ENDIF
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)
@@ -249,3 +265,12 @@ for t in lexer:
 parser = yacc.yacc()
 res = parser.parse(data, lexer=lexer)
 print(res)
+
+print('now your turn')
+
+def parse(data, lexer=lexer):
+    parser.error = 0
+    p = parser.parse(data, lexer=lexer)
+    if parser.error:
+        return None
+    return p

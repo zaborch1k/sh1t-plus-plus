@@ -66,21 +66,25 @@ class Performer(arcade.Sprite):
         # один шаг в любую сторону - 47.25
         self.center_x = 250 #тута пошали с координатами
         self.center_y = 250 #тута пошали с координатами
-        #self.change_x = 47.25
-        #self.change_y = 47.25
 
-    def on_update(self, dir, q):
+    def update(self, dir, num):
         # добавить проверку на границы экрана
-        if self.center_x <= 722.5:
+        step = 47.5
+        if self.center_x <= 722.5 and self.center_x + step * num <= 722.5:
             if dir == 'RIGHT':
-                self.center_x += 47.5 * q
-            elif dir == 'LEFT':
-                self.center_x -= 47.5 * q
-        if dir == 'UP':
-            self.center_y += 47.5 * q
-        elif dir == 'DOWN':
-            self.center_y -= 47.5 * q
-        self.update()
+                self.center_x += step * num
+
+        if self.center_x > 0:
+            if dir == 'LEFT':
+                self.center_x -= step * num
+
+        if self.center_y <= 722.5:
+            if dir == 'UP':
+                self.center_y += step * num
+
+        if self.center_y > 0:
+            if dir == 'DOWN':
+                self.center_y -= step * num
 
 class Polygon(arcade.Window):
     def __init__(self, width, height, title):
@@ -98,10 +102,8 @@ class Polygon(arcade.Window):
         self.performer.draw()
 
     def update(self, delta_time: float):
-        self.performer.on_update('RIGHT', 3)
-        self.performer.on_update('DOWN', 2)
-        self.performer.on_update('UP', 4)
-        self.performer.on_update('LEFT', 1)
+        self.performer.update('RIGHT', 3)
+        print(self.performer.center_x)
         
 
 
