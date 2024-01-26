@@ -1,37 +1,42 @@
-# графика (backup)
-# баги: не работает повторный запуск проги
-# создать два потока, один из которых отвечает за stop?
+# графика (gui_v1)
 import arcade
 import threading
 import tkinter as tk
 import tkinter.filedialog as tfd
 import tkinter.messagebox as tmb
 
-
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
 SCREEN_TITLE = "*performing field* (pls touch this window to update)"
 
-
 prog_space = tk.Tk()
-prog_space.title("interp") #тут менять название
+prog_space.title("interp") 
 prog_space.geometry("500x500")
 prog_space.resizable(False, False)
 window = None
 file_name = ""
 first = True
+
+def find_server(serv):
+    global server
+    server = serv
+
 def create_polygon():
     global window
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    
+
 def run_polygon():
-    global t
-    global first
+    global t, first, content_text
+    code = content_text.get(1.0, "end")
     if first == True:
         create_polygon()
         first = False
-    t = threading.Thread(target=arcade.run, daemon=True)
-    t.start()
+        server.gui_to_ser(code)
+        t = threading.Thread(target=arcade.run, daemon=True)
+        t.start()
+    else:
+        # *отправка code в main*
+        pass
 
 def kill_polygon():
     global window
@@ -121,4 +126,6 @@ class Polygon(arcade.Window):
         print(self.performer.center_x)
 
 data = [10]
-prog_space.mainloop()
+def run_gui():
+    global prog_space
+    prog_space.mainloop()

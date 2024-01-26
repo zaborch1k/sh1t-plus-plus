@@ -1,5 +1,6 @@
-# interp
-from lexparse import parse
+# interp бэкап, без связи с gui
+import lexparse
+
 class Interp:
     def __init__(self, prog):
         if not isinstance(prog, list):
@@ -8,6 +9,16 @@ class Interp:
             self.bprog = prog
         print(self.bprog)
         self.prog = self.bprog
+    
+    def check_loops_etc(self):
+        for pc in range(len(self.stat)):
+            lineno = self.stat[pc]
+            if self.prog[lineno][0] == 'REPEAT':
+                pass
+            elif self.prog[lineno][0] == 'IFBLOCK':
+                pass
+            elif self.prog[lineno][0] == 'varsEDURE':
+                pass
     
     def eval(self, expr):
         etype = expr[0]
@@ -34,9 +45,7 @@ class Interp:
     def assign(self, target, value):
         var = target
         self.vars[var] = self.eval(value)
-    
-    def sendmovedata():
-        pass
+
     def run(self):
         self.vars = {}
         self.loops = {}
