@@ -1,14 +1,9 @@
+# проводник между gui и main
 import threading
 
 class Server:
     def __init__(self):
         pass
-
-    def do_thread(self, t):
-        t.start()
-    
-    def join_thread(self, t):
-        t.join()
 
     def gui_to_ser(self, data):
         self.gui_data = data

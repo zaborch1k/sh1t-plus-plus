@@ -1,4 +1,4 @@
-# нетронутый, стабильно (почти)работающий файл с лексером и парсером
+# бэкап lexparse
 import lex
 import parcer as yacc
 from lex import LexToken

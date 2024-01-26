@@ -1,4 +1,4 @@
-# interp бэкап, без связи с gui
+# interp бэкап
 import lexparse
 
 class Interp:

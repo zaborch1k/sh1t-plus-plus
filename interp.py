@@ -53,7 +53,7 @@ class Interp:
         print('lets go')
         
         while 1:
-            # line = self.stat[self.pc] ^ сверху написано
+            # line = self.stat[self.pc]
             # instr = ... # 
             try:
                 instr = self.prog[self.pc]

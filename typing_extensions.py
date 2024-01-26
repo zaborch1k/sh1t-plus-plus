@@ -1,4 +1,4 @@
-# for arcade
+# arcade module
 import abc
 import collections
 import collections.abc

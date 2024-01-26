@@ -1,4 +1,4 @@
-# файл с лексером и парсером в процессе разработки
+# файл с лексером и парсером
 import lex
 import parcer as yacc
 from lex import LexToken

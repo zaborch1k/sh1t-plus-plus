@@ -1,4 +1,4 @@
-# графика (gui_v1)
+# графика 
 import arcade
 import threading
 import tkinter as tk
@@ -17,7 +17,8 @@ window = None
 file_name = ""
 first = True
 
-def find_server(serv):
+# попытка связи с main через проводник
+def find_server(serv): 
     global server
     server = serv
 
@@ -34,9 +35,6 @@ def run_polygon():
         server.gui_to_ser(code)
         t = threading.Thread(target=arcade.run, daemon=True)
         t.start()
-    else:
-        # *отправка code в main*
-        pass
 
 def kill_polygon():
     global window
@@ -80,12 +78,10 @@ open_button.place(x=360, y=20)
 class Performer(arcade.Sprite):
     def __init__(self, window):
         super().__init__("норм точка.png", 0.1)
-        # один шаг в любую сторону - 47.25
         self.center_x = 250 
         self.center_y = 250 
 
     def update(self, dir, num):
-        # добавить проверку на границы экрана
         step = 23.625
         w = 486.25
         h = 486.25

@@ -1,4 +1,4 @@
-# графика
+# графика (бэкап)
 import arcade
 import threading
 import tkinter as tk
@@ -12,7 +12,7 @@ SCREEN_TITLE = "*performing field* (pls touch this window to update)"
 
 
 prog_space = tk.Tk()
-prog_space.title("interp") #тут менять название
+prog_space.title("interp")
 prog_space.geometry("500x500")
 prog_space.resizable(False, False)
 window = None
@@ -84,12 +84,10 @@ open_button.place(x=360, y=20)
 class Performer(arcade.Sprite):
     def __init__(self, window):
         super().__init__("норм точка.png", 0.1)
-        # один шаг в любую сторону - 47.25
         self.center_x = 250 
         self.center_y = 250 
 
     def update(self, dir, num):
-        # добавить проверку на границы экрана
         step = 23.625
         w = 486.25
         h = 486.25
@@ -127,7 +125,6 @@ class Polygon(arcade.Window):
         if len(data) >= 1:
             self.performer.update('UP', data[0])
             del data[0]
-        print(self.performer.center_x) # DDD
-
+        print(self.performer.center_x) # debug
 data = [10]
 prog_space.mainloop()
