@@ -8,7 +8,7 @@ import tkinter.messagebox as tmb
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
-SCREEN_TITLE = "*performing field* (pls touch this window to update)"
+SCREEN_TITLE = "*performing field*"
 
 
 prog_space = tk.Tk()
@@ -17,26 +17,16 @@ prog_space.geometry("500x500")
 prog_space.resizable(False, False)
 window = None
 file_name = ""
-first = True
 def create_polygon():
     global window
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    
-def run_polygon():
-    global t
-    global first
-    if first == True:
-        create_polygon()
-        first = False
-    t = threading.Thread(target=arcade.run, daemon=True)
+    t = threading.Thread(target=arcade.run)
     t.start()
 
 def kill_polygon():
     global window
-    global t
-    window.performer.center_x = 250 
-    window.performer.center_y = 250 
-    t.join()
+    window.performer.center_x = 300 #тута пошали с координатами
+    window.performer.center_y = 300 #тута пошали с координатами
 
 def save_file():
     tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
@@ -58,48 +48,48 @@ content_text = tk.Text(prog_space, wrap="word")
 content_text.place(x=0, y=70, relheight=1, relwidth=1)
 
 stop_button = tk.Button(prog_space, text="STOP", width=10, height=2, command=kill_polygon)
-stop_button.place(x=60, y=20)
+stop_button.place(x=60, y=20) #если есть неровность пошали с координатами
 
-start_button = tk.Button(prog_space, text="START", width=10, height=2, command=run_polygon)
-start_button.place(x=160, y=20)
+start_button = tk.Button(prog_space, text="START", width=10, height=2, command=create_polygon)
+start_button.place(x=160, y=20) #если есть неровность пошали с координатами
 
 save_button = tk.Button(prog_space, text="SAVE", width=10, height=2, command=save_file)
-save_button.place(x=260, y=20)
+save_button.place(x=260, y=20) #если есть неровность пошали с координатами
 
 open_button = tk.Button(prog_space, text="OPEN", width=10, height=2, command=open_file)
-open_button.place(x=360, y=20)
+open_button.place(x=360, y=20) #если есть неровность пошали с координатами
 
 
 class Performer(arcade.Sprite):
     def __init__(self, window):
         super().__init__("норм точка.png", 0.1)
         # один шаг в любую сторону - 47.25
-        self.center_x = 250 
-        self.center_y = 250 
+        self.center_x = 250 #тута пошали с координатами
+        self.center_y = 250 #тута пошали с координатами
 
     def update(self, dir, num):
         # добавить проверку на границы экрана
-        step = 23.625
-        w = 486.25
-        h = 486.25
-        if self.center_x + step * num <= w and dir == 'RIGHT':
-            self.center_x += step * num
+        step = 47.5
+        if self.center_x <= 722.5 and self.center_x + step * num <= 722.5:
+            if dir == 'RIGHT':
+                self.center_x += step * num
 
-        elif self.center_x - step * num > 0 and dir == 'LEFT':
-            self.center_x -= step * num
+        if self.center_x > 0:
+            if dir == 'LEFT':
+                self.center_x -= step * num
 
-        elif self.center_y + step * num <= w and dir == 'UP':
-            self.center_y += step * num
+        if self.center_y <= 722.5:
+            if dir == 'UP':
+                self.center_y += step * num
 
-        elif self.center_y - step * num > 0 and dir == 'DOWN':
-            self.center_y -= step * num
-        else:
-            pass # вызов исключения 'попытка выйти за границы поля'
+        if self.center_y > 0:
+            if dir == 'DOWN':
+                self.center_y -= step * num
 
 class Polygon(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bg = arcade.load_texture("мош_фон.jpeg") 
+        self.bg = arcade.load_texture("мош_фон.jpeg") #тута качаем фон
         self.performer = Performer(self)
 
     def on_draw(self):
@@ -108,15 +98,11 @@ class Polygon(arcade.Window):
                                       SCREEN_HEIGHT / 2,
                                       SCREEN_WIDTH,
                                       SCREEN_HEIGHT,
-                                      self.bg)
+                                      self.bg) #тута рисуем фон
         self.performer.draw()
 
     def update(self, delta_time: float):
-        global data # должно быть полчучение data от interp -> (ex) ['RIGHT', 3]
-        if len(data) >= 1:
-            self.performer.update('UP', data[0])
-            del data[0]
+        self.performer.update('RIGHT', 3)
         print(self.performer.center_x)
 
-data = [10]
 prog_space.mainloop()

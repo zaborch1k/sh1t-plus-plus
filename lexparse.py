@@ -244,13 +244,13 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    print(f"\nSyntax error {p.value!r}")
-
+    # вызвать кнопочку error из gui
+    pass
 
 # only for debugging
 
 data = '''
-SET X = 3
+SEdT X = 3
 '''
 lexer = lex.lex()
 lexer = IndentLex(lexer)

@@ -1,4 +1,5 @@
-# графика
+# графика (backup)
+# баги: не работает повторный запуск проги
 import arcade
 import threading
 import tkinter as tk
