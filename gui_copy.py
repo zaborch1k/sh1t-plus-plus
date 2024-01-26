@@ -1,4 +1,4 @@
-# графика
+# графика (old vers)
 import arcade
 import threading
 import tkinter as tk

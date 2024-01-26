@@ -17,26 +17,37 @@ prog_space.geometry("500x500")
 prog_space.resizable(False, False)
 window = None
 file_name = ""
-first = True
+firstS = True
+firstF = True
 def create_polygon():
     global window
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     
 def run_polygon():
-    global t
-    global first
-    if first == True:
+    global t, t2, firstS
+    if firstS == True:
         create_polygon()
-        first = False
-    t = threading.Thread(target=arcade.run, daemon=True)
-    t.start()
+        firstS = False
+        t = threading.Thread(target=arcade.run, daemon=True)
+        t.start()
+    else:
+        t2.join()
+        print('run:', t.is_alive(), t2.is_alive())
+    
 
 def kill_polygon():
-    global window
-    global t
+    global window, t, t2, firstF
     window.performer.center_x = 250 
     window.performer.center_y = 250 
+    def do_nothing():
+        pass
+    if firstF == True:
+        t2 = threading.Thread(target=do_nothing)
+        firstF = False
+        t2.start()
     t.join()
+    print('stop:', t.is_alive(), t2.is_alive())
+    
 
 def save_file():
     tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
@@ -116,7 +127,7 @@ class Polygon(arcade.Window):
         if len(data) >= 1:
             self.performer.update('UP', data[0])
             del data[0]
-        print(self.performer.center_x)
+        print(self.performer.center_x) # DDD
 
 data = [10]
 prog_space.mainloop()
