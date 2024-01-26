@@ -27,6 +27,25 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
+    global first, ev_stop
+    code = content_text.get(1.0, "end")
+    if first:
+        create_polygon()
+        first = False
+        t = threading.Thread(target=arcade.run, daemon=True)
+        t.start()
+        ev_stop = threading.Event()
+        ev_stop.set()
+    else:
+        pass
+
+
+def kill_polygon():
+    ev_stop.wait()
+    window.performer.center_x = 250 
+    window.performer.center_y = 250 
+
+'''def run_polygon():
     global t, first, content_text
     code = content_text.get(1.0, "end")
     if first == True:
@@ -41,7 +60,7 @@ def kill_polygon():
     global t
     window.performer.center_x = 250 
     window.performer.center_y = 250 
-    t.join()
+    t.join()'''
 
 def save_file():
     tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
