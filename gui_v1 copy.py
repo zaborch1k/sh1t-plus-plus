@@ -1,5 +1,5 @@
 import arcade
-import threading
+import multiprocessing as mp
 import tkinter as tk
 import tkinter.filedialog as tfd
 import tkinter.messagebox as tmb
@@ -16,8 +16,26 @@ prog_space.resizable(False, False)
 window = None
 file_name = ""
 performer = None
-running = False
+first = True
 
+def create_polygon():
+    global window, performer
+    window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    performer = window.performer  # Get the performer instance from the window
+
+def run_polygon():
+    global t
+    create_polygon()
+    if first:
+        t = mp.Process(target=arcade.run, daemon=True)
+        t.start()
+
+def kill_polygon():
+    global window, t
+    window.close()
+    t.terminate()
+
+'''
 def create_polygon():
     global window, performer
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
@@ -34,7 +52,7 @@ def kill_polygon():
     running = False
     if performer:
         performer.center_x = 250
-        performer.center_y = 250
+        performer.center_y = 250'''
 
 def save_file():
     tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
@@ -107,11 +125,12 @@ class Polygon(arcade.Window):
         self.performer.draw()
 
     def update(self, delta_time: float):
-        global running
+        '''global running
         if running:
             self.performer.update('UP', 1)  # Update the performer's position
-        print(self.performer.center_x)
+        print(self.performer.center_x)'''
 
+'''
 def move_performer():
     global running
     while running:
@@ -123,6 +142,6 @@ def move_performer():
             arcade.get_window().update(1/60)  # Update the window (60 FPS)
         else:
             break
-
+'''
 data = [10]
 prog_space.mainloop()

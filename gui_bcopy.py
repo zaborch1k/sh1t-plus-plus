@@ -15,6 +15,7 @@ prog_space = tk.Tk()
 prog_space.title("interp") 
 prog_space.geometry("500x500")
 prog_space.resizable(False, False)
+
 window = None
 file_name = ""
 first = True
@@ -23,20 +24,14 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     
 def run_polygon():
-    global t
-    global first
-    if first == True:
+    global t, first, t1
+    if first:
         create_polygon()
-        first = False
-    t = threading.Thread(target=arcade.run, daemon=True)
-    t.start()
-
-def kill_polygon():
-    global window
-    global t
-    window.performer.center_x = 250 
-    window.performer.center_y = 250 
-    t.join()
+        t = threading.Thread(target=create_polygon)
+        t.start()
+    else:
+        t1 = threading.Thread(target=create_polygon)
+        t1.start()
 
 def save_file():
     tmb.showinfo(title="*сохранение файла*", message="Вы точно хотите сохранить файл?")
@@ -57,7 +52,7 @@ def open_file():
 content_text = tk.Text(prog_space, wrap="word")
 content_text.place(x=0, y=70, relheight=1, relwidth=1)
 
-stop_button = tk.Button(prog_space, text="STOP", width=10, height=2, command=kill_polygon)
+stop_button = tk.Button(prog_space, text="STOP", width=10, height=2, command=run_polygon)
 stop_button.place(x=60, y=20)
 
 start_button = tk.Button(prog_space, text="START", width=10, height=2, command=run_polygon)
