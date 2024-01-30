@@ -9,6 +9,7 @@ This library is for parsing JSON formatted Tiled Map Editormaps and tilesets to 
 PyTiled Parser is not tied to any particular graphics library or game engine.
 """
 
+
 # pylint: disable=too-few-public-methods
 
 from .common_types import Color, OrderedPair, Size
