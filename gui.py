@@ -1,3 +1,4 @@
+# графика, нет плавного движения
 import arcade
 import threading
 import tkinter as tk
@@ -29,7 +30,11 @@ def run_polygon():
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
-    move_performer()
+    # *если прошло получение данных о движении от interp*
+    # пример работы
+    window.performer.update('UP', 4)
+    window.performer.update('LEFT', 8)
+    window.performer.update('DOWN', 494884848)
     
 def kill_polygon():
     global window, t
@@ -68,6 +73,8 @@ save_button.place(x=260, y=20)
 open_button = tk.Button(prog_space, text="OPEN", width=10, height=2, command=open_file)
 open_button.place(x=360, y=20)
 
+def error_msg(txt):
+    tmb.showinfo(title="oops error :(", message=f'Error: {txt}')
 
 class Performer(arcade.Sprite):
     def __init__(self, window):
@@ -77,22 +84,21 @@ class Performer(arcade.Sprite):
 
     def update(self, dir, num):
         step = 23.625
-        spd = 7,875
-        w = 486.25
-        h = 486.25
-        if self.center_x + step * num <= w and dir == 'RIGHT':
+        m = 486.25
+        if self.center_x + step * num <= m and dir == 'RIGHT':
             self.center_x += step * num
 
         elif self.center_x - step * num > 0 and dir == 'LEFT':
             self.center_x -= step * num
 
-        elif self.center_y + step * num <= w and dir == 'UP':
+        elif self.center_y + step * num <= m and dir == 'UP':
             self.center_y += step * num
 
         elif self.center_y - step * num > 0 and dir == 'DOWN':
             self.center_y -= step * num
         else:
-            pass 
+            error_msg('попытка выйти за границы поля')
+            
 
 class Polygon(arcade.Window):
     def __init__(self, width, height, title):
@@ -108,9 +114,6 @@ class Polygon(arcade.Window):
                                       SCREEN_HEIGHT,
                                       self.bg)
         self.performer.draw()
-
-def move_performer():
-    pass
 
 data = [10]
 prog_space.mainloop()
