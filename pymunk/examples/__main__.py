@@ -5,6 +5,7 @@ import pathlib
 import sys
 from typing import Iterable
 
+
 if sys.argv[0].endswith("__main__.py"):
     # We change sys.argv[0] to make help message more useful
     # use executable without path, unquoted
