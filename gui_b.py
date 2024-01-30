@@ -1,3 +1,4 @@
+# backup
 import arcade
 import threading
 import tkinter as tk
@@ -110,7 +111,9 @@ class Polygon(arcade.Window):
         self.performer.draw()
 
 def move_performer():
-    pass
+    # примитив движения
+    global window
+    window.performer.update('UP', 3)
 
 data = [10]
 prog_space.mainloop()
