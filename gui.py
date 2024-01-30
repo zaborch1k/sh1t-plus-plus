@@ -5,6 +5,8 @@ import tkinter as tk
 import tkinter.filedialog as tfd
 import tkinter.messagebox as tmb
 
+from interp_b import get_data
+
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
@@ -25,6 +27,8 @@ def create_polygon():
 
 def run_polygon():
     global t, first, window
+    code = content_text.get(1.0, "end")
+    get_data(code)
     if first:
         create_polygon()
         first = False
