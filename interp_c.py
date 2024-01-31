@@ -35,8 +35,9 @@ class Interp:
         var = target
         self.vars[var] = self.eval(value)
     
+    def sendmovedata():
+        pass
     def run(self):
-        from gui import move_performer
         self.vars = {}
         self.loops = {}
         self.error = 0
@@ -69,7 +70,8 @@ class Interp:
                 
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
-                move_performer(instr[0], self.eval(instr[1]))
+                print('*жосткая связь с графикой*')
+                # отправка (-> gui): move(instr[1], self.eval(instr[2])))
 
 
             elif op == 'CALL':
