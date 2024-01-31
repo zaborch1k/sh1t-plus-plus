@@ -24,13 +24,19 @@ class Interp:
             if var in self.vars:
                 return self.vars[var]
             else:
+                # вызов ошибки из gui
                 print('undefined %s variable at line %s' %
-                      (var, self.stat[self.pc]))
+                      (var, self.stat[self.pc])) #
                 raise RuntimeError
     
     def assign(self, target, value):
         var = target
         self.vars[var] = self.eval(value)
+    
+    def add_prog(self, prog):
+        print(f'*добавляю прог {prog}*')
+        self.prog.insert(self.pc+1, prog)
+        print(self.prog) #
     
     def run(self):
         self.vars = {}
@@ -38,7 +44,7 @@ class Interp:
         self.error = None
         self.qmove = []
         self.pos = [11, 11]
-        self.m = 21
+        m = 21
 
         #self.stat = prog[self.pc] # реaлизовать 
         # в виде prog.keys(), когда сделаю prog cловарем. 
@@ -47,8 +53,6 @@ class Interp:
 
         if self.error:
             raise RuntimeError
-        
-        print('lets go')
         
         while 1:
             # line = self.stat[self.pc]
@@ -77,48 +81,47 @@ class Interp:
                     self.pos[1] += num
                 else:
                     self.pos[1] -= num
-                print(self.pos)
-                print('queue to move:', self.qmove)
+                print(self.pos) #
+                print('queue to move:', self.qmove) #
 
             elif op == 'CALL':
                 if instr[1] in self.vars:
-                    print('*i find a var %s*' %instr[1])
-                    self.prog.insert(self.pc+1, self.vars[instr[1]])
-                    print(self.prog)
+                    self.add_prog(instr[2])
                 else:
                     print('*oops, idk var %s*' % instr[1])
                     # error
 
             elif op == 'IFBLOCK':
-                print('*жосткая связь c графикой*')
-                # отправка gui -> instr[1]
-                # получение ответа-переменной -> marker = func()
-                marker = True # 
-                if marker == True:
-                    self.prog.insert(self.pc+1, self.vars[instr[1]])
-                    print(self.prog)
-                    # пока не работает обр. нескольких строк в block
-                    pass
+                marker = False
+                if instr[1] == 'RIGHT':
+                    if self.pos[0] == m:
+                        marker = True
+                if instr[1] == 'LEFT':
+                    if self.pos[0] == 0:
+                        marker = True
+                if instr[1] == 'UP':
+                    if self.pos[1] == m:
+                        marker = True
+                else:
+                    if self.pos[1] == 0:
+                        marker = True
+                
+                if marker:
+                    self.add_prog(instr[2])
 
             elif op == 'PROCEDURE':
                 self.vars[instr[1]] = instr[2]
-                print(self.vars) # 
 
             elif op == 'REPEAT':
                 for i in range(0, self.eval(instr[1])):
-                    self.prog.insert(self.pc+1, instr[2])
-                    print(self.prog) #
+                    self.add_prog(instr[2])
             
-            if self.pos[0] > 21 or self.pos[1] > 21 or self.pos[0] < 0 or self.pos[1] <0 :
+            if self.pos[0] > m or self.pos[1] > m or self.pos[0] < 0 or self.pos[1] <0 :
                 print('*вызов исключения в gui*')
                 break
-
-            if self.error:
-                # добавить вызов error из lexparser
-                pass
+            # добавить syntaxerror из lexparse
 
             self.pc += 1
-            print(self.pc) # 
 
 
 def get_data(data):
