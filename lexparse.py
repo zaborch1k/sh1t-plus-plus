@@ -143,15 +143,22 @@ class IndentLex:
             yield from tokens
 
 # парсер
-            
+l = 0
+
 def p_program(p):
     '''program : program statement
                | statement
                | '''
+    global l 
     if len(p) == 2 and p[1]:
-        p[0] = p[1]
+        p[0] = {}
+        p[0][l] = p[1]
     elif len(p) == 3 and p[1]:
-        p[0] = [p[1], p[2]]
+        p[1][l] = p[2]
+        print(p[1])
+        p[0] = p[1]
+    l += 1
+    
 
 
 def p_block(p):
@@ -254,7 +261,11 @@ def p_error(p):
 # only for debugging
 
 data = '''
-SET X = 3
+IFBLOCK RIGHT
+    RIGHT 5
+ENDIF
+
+
 '''
 
 lexer = lex.lex()

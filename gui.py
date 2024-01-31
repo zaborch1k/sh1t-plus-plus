@@ -1,4 +1,4 @@
-# графика
+# графика, рабочие исключения, нет связи с interp
 import arcade
 import threading
 import tkinter as tk
@@ -24,8 +24,8 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
-    from interp_b import get_data
     global t, first, window
+    from interp import get_data
     code = content_text.get(1.0, "end")
     get_data(code)
     if first:
@@ -33,7 +33,7 @@ def run_polygon():
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
-
+    
 def kill_polygon():
     global window, t
     window.performer.center_x = 250
@@ -113,9 +113,5 @@ class Polygon(arcade.Window):
                                       self.bg)
         self.performer.draw()
 
-def move_performer(dir, num):
-    global window
-    window.performer.update(dir, num)
-
-if __name__ == '__main__':
-    prog_space.mainloop()
+data = [10]
+prog_space.mainloop()

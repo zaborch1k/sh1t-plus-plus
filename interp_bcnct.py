@@ -35,9 +35,8 @@ class Interp:
         var = target
         self.vars[var] = self.eval(value)
     
-    def sendmovedata():
-        pass
     def run(self):
+        from gui_bcnct import move_performer
         self.vars = {}
         self.loops = {}
         self.error = 0
@@ -70,8 +69,7 @@ class Interp:
                 
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
-                print('*жосткая связь с графикой*')
-                # отправка (-> gui): move(instr[1], self.eval(instr[2])))
+                move_performer(instr[0], self.eval(instr[1]))
 
 
             elif op == 'CALL':
@@ -116,7 +114,7 @@ def get_data(data):
 
 
 def do_interp(data):
-    from lexparse import parse
+    from lexparse_b import parse
     
     i = Interp(parse(data))
     i.run()

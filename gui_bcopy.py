@@ -1,4 +1,4 @@
-# графика, нет плавного движения (backup)
+# графика, рабочие исключения, нет связи с interp
 import arcade
 import threading
 import tkinter as tk

@@ -1,13 +1,10 @@
 # interp
-from lexparse import parse
+
 class Interp:
     def __init__(self, prog):
-        if not isinstance(prog, list):
-            self.bprog = [prog]
-        else:
-            self.bprog = prog
-        print(self.bprog)
+        self.bprog = list(prog.values())
         self.prog = self.bprog
+        print(self.prog)#
     
     def eval(self, expr):
         etype = expr[0]
@@ -35,12 +32,13 @@ class Interp:
         var = target
         self.vars[var] = self.eval(value)
     
-    def sendmovedata():
-        pass
     def run(self):
         self.vars = {}
         self.loops = {}
-        self.error = 0
+        self.error = None
+        self.qmove = []
+        self.pos = [11, 11]
+        self.m = 21
 
         #self.stat = prog[self.pc] # реaлизовать 
         # в виде prog.keys(), когда сделаю prog cловарем. 
@@ -67,12 +65,20 @@ class Interp:
                 value = instr[2]
                 self.assign(target, value)
                 print(self.vars) #
-                
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
-                print('*жосткая связь с графикой*')
-                # отправка (-> gui): move(instr[1], self.eval(instr[2])))
-
+                num = self.eval(instr[1])
+                self.qmove.append((op, num))
+                if op == 'RIGHT':
+                    self.pos[0] += num
+                elif op == 'LEFT':
+                    self.pos[0] -= num
+                elif op == 'UP':
+                    self.pos[1] += num
+                else:
+                    self.pos[1] -= num
+                print(self.pos)
+                print('queue to move:', self.qmove)
 
             elif op == 'CALL':
                 if instr[1] in self.vars:
@@ -102,24 +108,37 @@ class Interp:
                 for i in range(0, self.eval(instr[1])):
                     self.prog.insert(self.pc+1, instr[2])
                     print(self.prog) #
+            
+            if self.pos[0] > 21 or self.pos[1] > 21 or self.pos[0] < 0 or self.pos[1] <0 :
+                print('*вызов исключения в gui*')
+                break
 
-            elif op == 'blank':
+            if self.error:
+                # добавить вызов error из lexparser
                 pass
 
             self.pc += 1
             print(self.pc) # 
 
-# only for debugging
-'''
-prog = [('RIGHT', ('num', 3)), ('DOWN', ('num', 4))]
-i = Interp(prog)
-try:
+
+def get_data(data):
+    print('hey there, i am from interp\n', data)
+    do_interp(data)
+
+
+def do_interp(data):
+    from lexparse import parse
+    i = Interp(parse(data))
     i.run()
-    raise SystemExit
-except RuntimeError:
-    pass
-'''
 
-
-
+# only for debugging
+if __name__ == '__main__':
+    from lexparse  import parse
+    prog = parse(data)
+    i = Interp(prog)
+    try:
+        i.run()
+        raise SystemExit
+    except RuntimeError:
+        pass
 

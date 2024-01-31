@@ -1,11 +1,9 @@
-# графика, нет плавного движения
+# графика, связь0.0 с interp
 import arcade
 import threading
 import tkinter as tk
 import tkinter.filedialog as tfd
 import tkinter.messagebox as tmb
-
-from interp_b import get_data
 
 
 SCREEN_WIDTH = 500
@@ -26,6 +24,7 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
+    from interp_bcnct import get_data
     global t, first, window
     code = content_text.get(1.0, "end")
     get_data(code)
@@ -34,12 +33,7 @@ def run_polygon():
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
-    # *если прошло получение данных о движении от interp*
-    # пример работы
-    window.performer.update('UP', 4)
-    window.performer.update('LEFT', 8)
-    window.performer.update('DOWN', 494884848)
-    
+
 def kill_polygon():
     global window, t
     window.performer.center_x = 250
@@ -119,5 +113,9 @@ class Polygon(arcade.Window):
                                       self.bg)
         self.performer.draw()
 
-data = [10]
-prog_space.mainloop()
+def move_performer(dir, num):
+    global window
+    window.performer.update(dir, num)
+
+if __name__ == '__main__':
+    prog_space.mainloop()

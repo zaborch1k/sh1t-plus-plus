@@ -1,4 +1,5 @@
-# interp
+# interp бэкап
+import lexparse_b
 
 class Interp:
     def __init__(self, prog):
@@ -8,6 +9,16 @@ class Interp:
             self.bprog = prog
         print(self.bprog)
         self.prog = self.bprog
+    
+    def check_loops_etc(self):
+        for pc in range(len(self.stat)):
+            lineno = self.stat[pc]
+            if self.prog[lineno][0] == 'REPEAT':
+                pass
+            elif self.prog[lineno][0] == 'IFBLOCK':
+                pass
+            elif self.prog[lineno][0] == 'varsEDURE':
+                pass
     
     def eval(self, expr):
         etype = expr[0]
@@ -34,9 +45,8 @@ class Interp:
     def assign(self, target, value):
         var = target
         self.vars[var] = self.eval(value)
-    
+
     def run(self):
-        from gui import move_performer
         self.vars = {}
         self.loops = {}
         self.error = 0
@@ -52,7 +62,7 @@ class Interp:
         print('lets go')
         
         while 1:
-            # line = self.stat[self.pc]
+            # line = self.stat[self.pc] ^ сверху написано
             # instr = ... # 
             try:
                 instr = self.prog[self.pc]
@@ -69,7 +79,8 @@ class Interp:
                 
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
-                move_performer(instr[0], self.eval(instr[1]))
+                print('*жосткая связь с графикой*')
+                # отправка (-> gui): move(instr[1], self.eval(instr[2])))
 
 
             elif op == 'CALL':
@@ -107,25 +118,17 @@ class Interp:
             self.pc += 1
             print(self.pc) # 
 
-
-def get_data(data):
-    print('hey there, i am from interp\n', data)
-    do_interp(data)
-
-
-def do_interp(data):
-    from lexparse import parse
-    
-    i = Interp(parse(data))
-    i.run()
-
 # only for debugging
-if __name__ == '__main__':
-    prog = parse(data)
-    i = Interp(prog)
-    try:
-        i.run()
-        raise SystemExit
-    except RuntimeError:
-        pass
+'''
+prog = [('RIGHT', ('num', 3)), ('DOWN', ('num', 4))]
+i = Interp(prog)
+try:
+    i.run()
+    raise SystemExit
+except RuntimeError:
+    pass
+'''
+
+
+
 

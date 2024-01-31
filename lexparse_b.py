@@ -1,4 +1,4 @@
-# бэкап бэкапа lexparse
+# файл с лексером и парсером
 import lex
 import parcer as yacc
 from lex import LexToken
@@ -55,6 +55,9 @@ def t_NUMBER(t):
     r"-?\d+"
     t.value = int(t.value)
     return t
+
+def t_error(t):
+    pass
 
 
 # второй лексер, для обработки отступов
@@ -146,8 +149,8 @@ def p_program(p):
                | statement
                | '''
     if len(p) == 2 and p[1]:
-        p[0] = p[1]
-    elif p[1]:
+        p[0] = [p[1]]
+    elif len(p) == 3 and p[1]:
         p[0] = [p[1], p[2]]
 
 
@@ -244,16 +247,23 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    print(f"\nSyntax error {p.value!r}")
+    # вызвать кнопочку error из gui
+    pass
 
 
 # only for debugging
 
 data = '''
-SET X = 3
+RIGHT 3
+RIGHT 3
+RIGHT 3
+RIGHT 3
+
 '''
+
 lexer = lex.lex()
 lexer = IndentLex(lexer)
+
 print()
 lexer.input(data)
 for t in lexer:
@@ -263,8 +273,9 @@ parser = yacc.yacc()
 res = parser.parse(data, lexer=lexer)
 print(res)
 
-
+# 
 def parse(data, lexer=lexer):
+    parser = yacc.yacc()
     parser.error = 0
     p = parser.parse(data, lexer=lexer)
     if parser.error:
