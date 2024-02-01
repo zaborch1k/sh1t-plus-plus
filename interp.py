@@ -18,7 +18,7 @@ class Interp:
             elif expr[1] == '*':
                 return self.eval(expr[2]) * self.eval(expr[3])
             elif expr[1] == '/':
-                return float(self.eval(expr[2])) / self.eval(expr[3])
+                return float(self.eval(expr[2]) / self.eval(expr[3]))
         elif etype == 'var':
             var = expr[1]
             if var in self.vars:
@@ -37,7 +37,7 @@ class Interp:
             self.vars[var] = (type, value)
 
     
-    def add_prog(self, prog):
+    def add_prog(self, prog): # не работает 
         print(f'*добавляю прог {prog}*')
         print(self.prog)
         pc = self.pc
@@ -48,6 +48,20 @@ class Interp:
             print('II', i)
         print('im done', self.prog) #
     
+    def check_range_error(self, num):
+        msg = None
+        if not isinstance(num, int):
+            msg = 'не принимает нецелые значения'
+        elif num < 1:
+            msg = 'не может быть < 1'
+        elif num > 1:
+            msg = 'не может быть > 1000'
+
+        if msg:
+            return f'неверное значение параметра функции({msg})' 
+        else:
+            return None
+    
     def run(self):
         self.vars = {}
         self.loops = {}
@@ -56,19 +70,10 @@ class Interp:
         self.pos = [11, 11]
         m = 21
         print('i am running')
-
-        #self.stat = prog[self.pc] # реaлизовать 
-        # в виде prog.keys(), когда сделаю prog cловарем. 
-        # это будет список всех строк
         self.pc = 0
 
-        #if self.error:
-         #   raise RuntimeError
-        
         while 1:
-            # line = self.stat[self.pc]
-            # instr = ... # 
-            print('new NEW NEW NEW')
+            print('\nnew NEW NEW NEW\n') ##
             try:
                 instr = self.prog[self.pc]
                 print('INSTR:', instr) #
@@ -79,19 +84,25 @@ class Interp:
             if op == 'SET':
                 target = instr[1]
                 value = instr[2]
-                self.assign(target, value, 'var')
+                self.error = self.check_range_error(eval(instr[2]))
+                if not self.error:
+                    self.assign(target, value, 'var')
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
                 num = self.eval(instr[1])
-                self.qmove.append((op, num))
-                if op == 'RIGHT':
-                    self.pos[0] += num
-                elif op == 'LEFT':
-                    self.pos[0] -= num
-                elif op == 'UP':
-                    self.pos[1] += num
-                else:
-                    self.pos[1] -= num
+                print(num)
+                self.error = self.check_range_error(num)
+
+                if not self.error:
+                    self.qmove.append((op, num))
+                    if op == 'RIGHT':
+                        self.pos[0] += num
+                    elif op == 'LEFT':
+                        self.pos[0] -= num
+                    elif op == 'UP':
+                        self.pos[1] += num
+                    else:
+                        self.pos[1] -= num
 
             elif op == 'CALL':
                 if instr[1] in self.vars:
@@ -123,8 +134,10 @@ class Interp:
                 #self.vars[instr[1]] = instr[2]
 
             elif op == 'REPEAT':
-                for i in range(0, self.eval(instr[1])):
-                    self.add_prog(instr[2])
+                self.error = self.check_range_error(num)
+                if not self.error:
+                    for i in range(0, self.eval(instr[1])):
+                        self.add_prog(instr[2])
             
             if self.pos[0] > m or self.pos[1] > m or self.pos[0] < 0 or self.pos[1] <0 :
                 del self.qmove[-1]

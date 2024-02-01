@@ -275,9 +275,9 @@ print(res)
 '''
 # 
 def parse(data):
-    lexer = lex.lex()
+    lexer = lex.lex(debug=False)
     lexer = IndentLex(lexer)
-    parser = yacc.yacc()
+    parser = yacc.yacc(debug=False)
     parser.error = 0
     p = parser.parse(data, lexer=lexer)
     if parser.error:
