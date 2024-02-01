@@ -1,7 +1,7 @@
 # файл с лексером и парсером
-import lex
-import parcer as yacc
-from lex import LexToken
+import pycparser.ply.lex as lex
+import pycparser.ply.yacc as yacc
+from pycparser.ply.lex import LexToken
 
 # лексер
 keywords = (

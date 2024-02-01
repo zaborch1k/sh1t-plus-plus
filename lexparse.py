@@ -1,7 +1,7 @@
 # файл с лексером и парсером
-import lex
-import parcer as yacc
-from lex import LexToken
+import pycparser.ply.lex as lex
+import pycparser.ply.yacc as yacc
+from pycparser.ply.lex import LexToken
 
 # лексер
 keywords = (
@@ -178,11 +178,6 @@ def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
     p[0] = p[1]
-    """
-    if len(p) == 3:
-        lexer.lineno += 1
-    p[0] = (lexer.lineno, p[1])"""
-
 
 def p_command_ifblock(p):
     '''command : IFBLOCK RIGHT block ENDIF
@@ -268,8 +263,6 @@ ENDIF
 
 '''
 
-lexer = lex.lex()
-lexer = IndentLex(lexer)
 '''
 print()
 lexer.input(data)
@@ -281,11 +274,12 @@ res = parser.parse(data, lexer=lexer)
 print(res)
 '''
 # 
-def parse(data, lexer=lexer):
+def parse(data):
+    lexer = lex.lex()
+    lexer = IndentLex(lexer)
     parser = yacc.yacc()
     parser.error = 0
     p = parser.parse(data, lexer=lexer)
     if parser.error:
         return None
     return p
-

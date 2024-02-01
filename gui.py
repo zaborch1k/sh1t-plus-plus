@@ -26,13 +26,13 @@ def create_polygon():
 def run_polygon():
     global t, first, window
     from interp import get_data
-    code = content_text.get(1.0, "end")
-    get_data(code)
     if first:
         create_polygon()
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
+    code = content_text.get(1.0, "end")
+    get_data(code)
     
 def kill_polygon():
     global window, t
@@ -76,7 +76,7 @@ def error_msg(txt):
 
 class Performer(arcade.Sprite):
     def __init__(self, window):
-        super().__init__("норм точка.png", 0.1)
+        super().__init__("C:\\Users\\user\\Documents\\GitHub\\interp\\норм точка.png", 0.1)
         self.center_x = 250 
         self.center_y = 250 
 
@@ -101,7 +101,7 @@ class Performer(arcade.Sprite):
 class Polygon(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
-        self.bg = arcade.load_texture("мош_фон.jpeg") 
+        self.bg = arcade.load_texture("C:\\Users\\user\\Documents\\GitHub\\interp\\мош_фон.jpeg") 
         self.performer = Performer(self)
 
     def on_draw(self):
