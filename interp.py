@@ -22,7 +22,10 @@ class Interp:
         elif etype == 'var':
             var = expr[1]
             if var in self.vars:
-                return self.vars[var]
+                if self.vars[var][0] == 'func':
+                    self.error = 'присвоение переменной значения функции'
+                else:
+                    return self.vars[var]
             else:
                 self.error = 'обращение к неопределенной переменной'
     
@@ -32,7 +35,11 @@ class Interp:
         if var in self.vars.keys() and type == 'func' and self.vars[var][0] == 'func':
             self.error = 'объявление уже существующей процедуры'
         elif type == 'var':
-            self.vars[var] = (type, self.eval(value))
+            value = self.eval(value)
+            while not self.error:
+                self.error = self.check_range_error(value)
+                self.vars[var] = (type, value)
+                break
         elif type == 'func':
             self.vars[var] = (type, value)
 
@@ -84,9 +91,7 @@ class Interp:
             if op == 'SET':
                 target = instr[1]
                 value = instr[2]
-                self.error = self.check_range_error(eval(instr[2]))
-                if not self.error:
-                    self.assign(target, value, 'var')
+                self.assign(target, value, 'var')
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
                 num = self.eval(instr[1])
