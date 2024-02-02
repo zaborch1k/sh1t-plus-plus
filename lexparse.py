@@ -144,6 +144,15 @@ class IndentLex:
 
 # парсер
 l = 0
+nest_lvl = 0
+
+def check_nest_lvl():
+    global nest_lvl
+    nest_lvl += 1
+    err = None
+    if nest_lvl > 3:
+        err = True
+    return err
 
 def p_program(p):
     '''program : program statement
@@ -158,7 +167,6 @@ def p_program(p):
         print(p[1])
         p[0] = p[1]
     l += 1
-    
 
 
 def p_block(p):
@@ -184,17 +192,28 @@ def p_command_ifblock(p):
                | IFBLOCK DOWN block ENDIF
                | IFBLOCK UP block ENDIF
                | IFBLOCK LEFT block ENDIF'''
-    p[0] = (p[1], p[2], p[3])
-
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
 
 def p_command_repeat(p):
     '''command : REPEAT expr block ENDREPEAT'''
-    p[0] = (p[1], p[2], p[3])
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
     
 
 def p_command_procedure(p):
     '''command : PROCEDURE ID block ENDPROC'''
-    p[0] = (p[1], p[2], p[3])
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
     
 
 def p_command_call(p):
@@ -249,18 +268,13 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    # вызвать кнопочку error из gui
     pass
 
 
 # only for debugging
 
 data = '''
-IFBLOCK RIGHT
-    RIGHT 5
-ENDIF
-
-
+$
 '''
 
 '''
@@ -283,3 +297,5 @@ def parse(data):
     if parser.error:
         return None
     return p
+
+print(parse(data))
