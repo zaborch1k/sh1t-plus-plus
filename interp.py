@@ -158,7 +158,7 @@ def get_data(data):
 
 
 def do_interp(data):
-    from lexparse import parse
+    from lexparse_b import parse
     i = 0
     data = parse(data)
     i = Interp(data)

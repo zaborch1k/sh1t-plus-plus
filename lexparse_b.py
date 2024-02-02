@@ -56,8 +56,13 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
+error = None
+
 def t_error(t):
-    pass
+    global error
+    error = f"недопустимый символ '{t.value[0]}'"
+    t.lexer.skip(1)
+    
 
 
 # второй лексер, для обработки отступов
@@ -143,15 +148,30 @@ class IndentLex:
             yield from tokens
 
 # парсер
-            
+l = 0
+nest_lvl = 0
+
+def check_nest_lvl():
+    global nest_lvl
+    nest_lvl += 1
+    err = None
+    if nest_lvl > 3:
+        err = True
+    return err
+
 def p_program(p):
     '''program : program statement
                | statement
                | '''
+    global l 
     if len(p) == 2 and p[1]:
-        p[0] = [p[1]]
+        p[0] = {}
+        p[0][l] = p[1]
     elif len(p) == 3 and p[1]:
-        p[0] = [p[1], p[2]]
+        p[1][l] = p[2]
+        print(p[1])
+        p[0] = p[1]
+    l += 1
 
 
 def p_block(p):
@@ -171,28 +191,39 @@ def p_statement(p):
     '''statement : command NEWLINE
                  | command'''
     p[0] = p[1]
-    """
-    if len(p) == 3:
-        lexer.lineno += 1
-    p[0] = (lexer.lineno, p[1])"""
-
 
 def p_command_ifblock(p):
     '''command : IFBLOCK RIGHT block ENDIF
                | IFBLOCK DOWN block ENDIF
                | IFBLOCK UP block ENDIF
                | IFBLOCK LEFT block ENDIF'''
-    p[0] = (p[1], p[2], p[3])
-
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
 
 def p_command_repeat(p):
     '''command : REPEAT expr block ENDREPEAT'''
-    p[0] = (p[1], p[2], p[3])
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
     
 
 def p_command_procedure(p):
     '''command : PROCEDURE ID block ENDPROC'''
-    p[0] = (p[1], p[2], p[3])
+    err = check_nest_lvl()
+    if err:
+        p[0] = 'превышение максимального уровня вложенности (больше 3)'
+    else:
+        p[0] = (p[1], p[2], p[3])
+
+def p_command_procedure_error(p):
+    '''command : PROCEDURE ID error ENDPROC'''
+    global error
+    error = 'oh fuck error'
     
 
 def p_command_call(p):
@@ -212,6 +243,10 @@ def p_command_set(p):
     '''command : SET ID EQUALS expr'''
     p[0] = (p[1], p[2], p[4])
 
+def p_command_set_error(p):
+    '''command : SET ID EQUALS error '''
+    global error
+    error = f"недопустимая команда '{p[4].value}' в выражении SET"
 
 def p_expr(p):
     '''expr : expr PLUS factor
@@ -247,23 +282,21 @@ def p_fact_paren(p):
 
 
 def p_error(p):
-    # вызвать кнопочку error из gui
-    pass
+    global error
+    if p.value == '\n':
+        error = f"недопустимая команда"
+    else:
+        error = f"недопустимая команда '{p.value}'"
 
 
 # only for debugging
 
-data = '''
-RIGHT 3
-RIGHT 3
-RIGHT 3
-RIGHT 3
-
+data = '''PROCEDURE d
+ENDPROC
 '''
 
-lexer = lex.lex()
-lexer = IndentLex(lexer)
 
+'''
 print()
 lexer.input(data)
 for t in lexer:
@@ -272,13 +305,16 @@ for t in lexer:
 parser = yacc.yacc()
 res = parser.parse(data, lexer=lexer)
 print(res)
-
+'''
 # 
-def parse(data, lexer=lexer):
-    parser = yacc.yacc()
-    parser.error = 0
-    p = parser.parse(data, lexer=lexer)
-    if parser.error:
-        return None
+def parse(data):
+    global error
+    lexer = lex.lex(debug=False)
+    lexer = IndentLex(lexer)
+    parser = yacc.yacc(debug=False)
+    p = parser.parse(data, lexer=lexer, debug=0)
+    if error:
+        return {'0': error}
     return p
 
+print(parse(data))
