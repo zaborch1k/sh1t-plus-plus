@@ -312,9 +312,7 @@ def parse(data):
     lexer = lex.lex(debug=False)
     lexer = IndentLex(lexer)
     parser = yacc.yacc(debug=False)
-    p = parser.parse(data, lexer=lexer, debug=0)
+    p = parser.parse(data, lexer=lexer, debug=False)
     if error:
         return {'0': error}
     return p
-
-print(parse(data))
