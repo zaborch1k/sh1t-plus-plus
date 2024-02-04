@@ -10,13 +10,10 @@ SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
 SCREEN_TITLE = "*performing field* (pls touch this window to update)"
 
-if __name__ == '__main__':
-    prog_space = tk.Tk()
-    prog_space.title("interp") 
-    prog_space.geometry("500x500")
-    prog_space.resizable(False, False)
-else:
-    prog_space = None
+prog_space = tk.Tk()
+prog_space.title("interp") 
+prog_space.geometry("500x500")
+prog_space.resizable(False, False)
 
 window = None
 file_name = ""
@@ -36,9 +33,17 @@ def run_polygon():
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
+    window.performer.center_x = 250
+    window.performer.center_y = 250
     code = content_text.get(1.0, "end")
     data = get_data(code)
     print(data)
+    mdata = data[0]
+    err = data[1]
+    for i in mdata:
+        window.performer.update(i[0], i[1])
+    if err:
+        error_msg(err)
     
 def kill_polygon():
     global window, t
