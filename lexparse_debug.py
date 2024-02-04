@@ -32,8 +32,7 @@ tokens = keywords + (
     'NEWLINE',
     'INDENT',
     'DEDENT',
-    'WS',
-    'EOF'
+    'WS'
 )
 
 def t_ID(t):
@@ -51,7 +50,6 @@ t_LPAREN  = r"\("
 t_RPAREN  = r"\)"
 t_WS = r'[^\n\S]+'
 t_NEWLINE = r'\n'
-t_EOF = r'\Z'
 
 def t_NUMBER(t):
     r"-?\d+"
@@ -173,6 +171,7 @@ def p_program(p):
         print(p[1])
         p[0] = p[1]
     l += 1
+
 
 def p_block(p):
     '''block : NEWLINE INDENT groupstat DEDENT'''
@@ -377,7 +376,7 @@ data = '''PROCEDURE x
 
 
 def parse(data):
-    data = data + '\n\Z'
+    data = data + '\n'
     print(data)
     global error, l, nest_lvl
     l = 0
