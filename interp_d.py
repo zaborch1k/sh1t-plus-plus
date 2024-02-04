@@ -155,8 +155,10 @@ def get_data(data):
 
 
 def do_interp(data):
-    from lexparse_b import parse
+    from lexparse_debug import parse
     i = None
     data = parse(data)
     i = Interp(data)
     return i.run()
+
+

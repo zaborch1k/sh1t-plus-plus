@@ -18,26 +18,30 @@ prog_space.resizable(False, False)
 window = None
 file_name = ""
 first = True
-mdata = None
-err = None
 
 def create_polygon():
     global window
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
+    from interp_d import get_data
     global t, first, window
-    from interp import get_data
+    mdata = None
+    err = None
+
     if first:
         create_polygon()
         first = False
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
+
     window.performer.center_x = 250
     window.performer.center_y = 250
+
     code = content_text.get(1.0, "end")
+    print(code)
     data = get_data(code)
-    print(data)
+    
     mdata = data[0]
     err = data[1]
     for i in mdata:

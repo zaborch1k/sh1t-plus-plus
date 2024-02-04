@@ -207,7 +207,7 @@ def p_command_ifblock(p):
 def p_command_ifblock_error(p):
     '''command : IFBLOCK error'''
     global error
-    error = f"недопустимый параметр для IFBLOCK: {p[2].value} "
+    error = f"недопустимый параметр для IFBLOCK: {p[2].value}"
 
 def p_command_ifblock_error1(p):
     '''command : IFBLOCK RIGHT error
@@ -242,10 +242,11 @@ def p_command_repeat_error(p):
 def p_command_repeat_error1(p):
     '''command : REPEAT expr error'''
     global error
-    error = f'нет отступа после REPEAT {p[2]}'
+    error = f'нет отступа после REPEAT'
 
 def p_command_repeat_error2(p):
-    '''command : REPEAT expr block error'''
+    '''command : REPEAT expr block error
+               | REPEAT expr block'''
     global error
     error = f'нет ENDREPEAT для REPEAT'
 
@@ -277,8 +278,6 @@ def p_command_procedure_error2(p):
     global error
     error = f'нет ENDPROC для PROCEDURE'
 
-
-    
 
 def p_command_call(p):
     '''command : CALL ID'''
@@ -369,9 +368,7 @@ def p_error(p):
 
 # only for debugging
 
-data = '''PROCEDURE x 
-    RIGHT 3
-
+data = '''SET X = X+5
 '''
 
 
