@@ -22,24 +22,25 @@ class Interp:
             var = expr[1]
             if var in self.vars:
                 if self.vars[var][0] == 'func':
-                    self.error = 'присвоение переменной значения процедуры'
+                    self.error = 'недопустимое действие с процедурой'
                 else:
-                    return self.vars[var]
+                    return self.vars[var][0]
             else:
                 self.error = 'обращение к неопределенной переменной'
-    
-    def assign(self, target, value, type):
+        
+    def assign(self, target, value, type=None):
         var = target
-        if var in self.vars.keys() and type == 'func' and self.vars[var][0] == 'func':
+        if var in self.vars.keys() and type and self.vars[var][0] == 'func':
             self.error = 'объявление уже существующей процедуры'
-        elif type == 'var':
-            value = self.eval(value)
-            while not self.error:
-                self.error = self.check_range_error(value)
-                self.vars[var] = (type, value)
-                break
-        elif type == 'func':
+        elif type: 
+            # if function
             self.vars[var] = (type, value)
+        else: 
+            # if just variable
+            value = self.eval(value)
+            self.error = self.check_range_error(value)
+            if not self.error:
+                self.vars[var] = (value,)
     
     def check_range_error(self, num):
         msg = None
@@ -51,7 +52,7 @@ class Interp:
             msg = 'не может быть > 1000'
 
         if msg:
-            return f'неверное значение параметра процедуры({msg})' 
+            return f'неверное значение параметра команды ({msg})' 
         else:
             return None
     
@@ -61,11 +62,10 @@ class Interp:
         self.qmove = []
         self.pos = [11, 11]
         m = 21
-        print('i am running')
         self.pc = 0
 
         while 1:
-            print('\nnew NEW NEW NEW\n') ##
+            print('\nnew\n') ##
             try:
                 if isinstance(self.prog[0], str):
                     self.error = self.prog[0]
@@ -81,7 +81,7 @@ class Interp:
             if op == 'SET':
                 target = instr[1]
                 value = instr[2]
-                self.assign(target, value, 'var')
+                self.assign(target, value)
 
             elif op in ('RIGHT', 'LEFT', 'DOWN', 'UP'):
                 num = self.eval(instr[1])
@@ -160,5 +160,4 @@ def do_interp(data):
     data = parse(data)
     i = Interp(data)
     return i.run()
-
 

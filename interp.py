@@ -2,7 +2,6 @@
 
 class Interp:
     def __init__(self, prog):
-        print(prog)
         self.prog = list(prog.values())
     
     def eval(self, expr):
@@ -61,11 +60,9 @@ class Interp:
         self.qmove = []
         self.pos = [11, 11]
         m = 21
-        print('i am running')
         self.pc = 0
 
         while 1:
-            print('\nnew NEW NEW NEW\n') ##
             try:
                 if isinstance(self.prog[0], str):
                     self.error = self.prog[0]
@@ -73,7 +70,6 @@ class Interp:
                     op = None
                 else:
                     instr = self.prog[self.pc]
-                    print('INSTR:', instr) #
                     op = instr[0]
             except:
                 return (self.qmove, self.error)
@@ -147,7 +143,7 @@ class Interp:
             self.pc += 1
             print('pos:', self.pos) #
             print('queue to move:', self.qmove) #
-            print('vars:', self.vars) #
+            print('vars:', self.vars, '\n') #
 
 
 def get_data(data):

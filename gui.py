@@ -24,7 +24,7 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
-    from interp_d import get_data
+    from interp_d import get_data ##
     global t, first, window
     mdata = None
     err = None
@@ -68,8 +68,12 @@ def open_file():
     global file_name
     file_name = tfd.askopenfilename()
     content_text.delete(1.0, "end")
-    with open(file_name,  encoding="utf-8") as bobr:
-        content_text.insert(1.0, bobr.read())
+    try:
+        with open(file_name,  encoding="utf-8") as bobr:
+            content_text.insert(1.0, bobr.read())
+    except:
+        error_msg('ошибка при попытке открытия файла')
+
 
 def error_msg(txt):
     tmb.showinfo(title="oops error :(", message=f'Error: {txt}')

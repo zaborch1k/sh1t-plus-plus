@@ -56,13 +56,8 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
-error = None
-
 def t_error(t):
-    global error
-    error = f"недопустимый символ '{t.value[0]}'"
-    t.lexer.skip(1)
-    
+    t.lexer.error = t.value[0]
 
 
 # второй лексер, для обработки отступов
@@ -144,7 +139,8 @@ class IndentLex:
                     indent_stack.pop()
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent") 
+                    global error
+                    error = 'неправильный уровень отступа'
             yield from tokens
 
 # парсер
@@ -215,7 +211,7 @@ def p_command_ifblock_error1(p):
                | IFBLOCK UP error
                | IFBLOCK LEFT error'''
     global error
-    error = f'нет отступа после IFBLOCK {p[2]}'
+    error = f'неправильный уровень отступа после IFBLOCK {p[2]}'
 
 def p_command_ifblock_error2(p):
     '''command : IFBLOCK RIGHT block error
@@ -242,7 +238,7 @@ def p_command_repeat_error(p):
 def p_command_repeat_error1(p):
     '''command : REPEAT expr error'''
     global error
-    error = f'нет отступа после REPEAT'
+    error = f'неправильный уровень отступа после REPEAT'
 
 def p_command_repeat_error2(p):
     '''command : REPEAT expr block error
@@ -271,7 +267,7 @@ def p_command_procedure_error1(p):
     '''command : PROCEDURE ID NEWLINE error
                | PROCEDURE ID error'''
     global error
-    error = f'нет отступа после PROCEDURE'
+    error = f'неправильный уровень отступа после PROCEDURE'
 
 def p_command_procedure_error2(p):
     '''command : PROCEDURE ID block error'''
@@ -368,20 +364,28 @@ def p_error(p):
 
 # only for debugging
 
-data = '''SET X = X+5
+data = '''RIGHT $
 '''
+
+lexer = lex.lex()
+lexer.input(data)
+print(t_error)
 
 
 def parse(data):
     data = data + '\n'
     print(data)
-    global error, l, nest_lvl
+    global l, nest_lvl
     l = 0
     nest_lvl = 0
-    lexer = lex.lex(debug=True)
-    lexer = IndentLex(lexer)
-    parser = yacc.yacc(debug=True)
-    p = parser.parse(data, lexer=lexer, debug=True)
+    lexer = lex.lex()
+    global error
+    error = None
+    if not error:
+        lexer = IndentLex(lexer)
+        if not error:
+            parser = yacc.yacc()
+            p = parser.parse(data, lexer=lexer)
     if error:
         return {'0': error}
     return p

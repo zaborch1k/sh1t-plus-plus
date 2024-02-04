@@ -177,7 +177,6 @@ def p_block(p):
     p[0] = (p[3])
 
 
-
 def p_groupstat(p):
     '''groupstat : groupstat statement
                  | '''
