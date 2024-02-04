@@ -76,9 +76,7 @@ class Interp:
                     print('INSTR:', instr) #
                     op = instr[0]
             except:
-                from gui import movedata
-                movedata((self.qmove, self.error))
-                break
+                return (self.qmove, self.error)
 
             if op == 'SET':
                 target = instr[1]
@@ -153,7 +151,7 @@ class Interp:
 
 
 def get_data(data):
-    do_interp(data)
+    return do_interp(data)
 
 
 def do_interp(data):
@@ -161,4 +159,4 @@ def do_interp(data):
     i = 0
     data = parse(data)
     i = Interp(data)
-    i.run()
+    return i.run()

@@ -37,7 +37,8 @@ def run_polygon():
         t = threading.Thread(target=window.run, daemon=True)
         t.start()
     code = content_text.get(1.0, "end")
-    get_data(code)
+    data = get_data(code)
+    print(data)
     
 def kill_polygon():
     global window, t
