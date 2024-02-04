@@ -297,5 +297,3 @@ def parse(data):
     if parser.error:
         return None
     return p
-
-print(parse(data))

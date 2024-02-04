@@ -67,8 +67,6 @@ class Interp:
         while 1:
             print('\nnew NEW NEW NEW\n') ##
             try:
-                print(type(self.prog[0]))
-
                 if isinstance(self.prog[0], str):
                     self.error = self.prog[0]
                     self.prog = []
@@ -78,6 +76,8 @@ class Interp:
                     print('INSTR:', instr) #
                     op = instr[0]
             except:
+                from gui import movedata
+                movedata((self.qmove, self.error))
                 break
 
             if op == 'SET':
@@ -142,11 +142,10 @@ class Interp:
             if self.pos[0] > m or self.pos[1] > m or self.pos[0] < 0 or self.pos[1] <0 :
                 del self.qmove[-1]
                 self.error = 'попытка выйти за границы поля'
-            # добавить syntaxerror из lexparse
                 
             if self.error:
                 print((self.qmove, self.error))
-                break
+                self.prog = {}
             self.pc += 1
             print('pos:', self.pos) #
             print('queue to move:', self.qmove) #

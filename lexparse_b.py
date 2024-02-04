@@ -148,9 +148,7 @@ class IndentLex:
             yield from tokens
 
 # парсер
-l = 0
-nest_lvl = 0
-
+            
 def check_nest_lvl():
     global nest_lvl
     nest_lvl += 1
@@ -283,16 +281,15 @@ def p_fact_paren(p):
 
 def p_error(p):
     global error
-    if p.value == '\n':
+    if p == '\n':
         error = f"недопустимая команда"
     else:
-        error = f"недопустимая команда '{p.value}'"
+        error = f"недопустимая команда '{p.value}"
 
 
 # only for debugging
 
-data = '''PROCEDURE d
-ENDPROC
+data = '''SET X = 3+4 RIGHT
 '''
 
 
@@ -308,7 +305,9 @@ print(res)
 '''
 # 
 def parse(data):
-    global error
+    global error, l, nest_lvl
+    l = 0
+    nest_lvl = 0
     lexer = lex.lex(debug=False)
     lexer = IndentLex(lexer)
     parser = yacc.yacc(debug=False)

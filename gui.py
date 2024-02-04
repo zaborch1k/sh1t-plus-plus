@@ -10,14 +10,19 @@ SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
 SCREEN_TITLE = "*performing field* (pls touch this window to update)"
 
+if __name__ == '__main__':
+    prog_space = tk.Tk()
+    prog_space.title("interp") 
+    prog_space.geometry("500x500")
+    prog_space.resizable(False, False)
+else:
+    prog_space = None
 
-prog_space = tk.Tk()
-prog_space.title("interp") 
-prog_space.geometry("500x500")
-prog_space.resizable(False, False)
 window = None
 file_name = ""
 first = True
+mdata = None
+err = None
 
 def create_polygon():
     global window
@@ -56,6 +61,9 @@ def open_file():
     with open(file_name,  encoding="utf-8") as bobr:
         content_text.insert(1.0, bobr.read())
 
+def error_msg(txt):
+    tmb.showinfo(title="oops error :(", message=f'Error: {txt}')
+
 content_text = tk.Text(prog_space, wrap="word")
 content_text.place(x=0, y=70, relheight=1, relwidth=1)
 
@@ -71,8 +79,6 @@ save_button.place(x=260, y=20)
 open_button = tk.Button(prog_space, text="OPEN", width=10, height=2, command=open_file)
 open_button.place(x=360, y=20)
 
-def error_msg(txt):
-    tmb.showinfo(title="oops error :(", message=f'Error: {txt}')
 
 class Performer(arcade.Sprite):
     def __init__(self, window):
@@ -113,5 +119,6 @@ class Polygon(arcade.Window):
                                       self.bg)
         self.performer.draw()
 
-data = [10]
-prog_space.mainloop()
+if __name__ == '__main__':
+    prog_space.mainloop()
+    
