@@ -281,7 +281,7 @@ def p_fact_paren(p):
 
 def p_error(p):
     global error
-    if p == '\n':
+    if p.value == '\n':
         error = f"недопустимая команда"
     else:
         error = f"недопустимая команда '{p.value}"
@@ -289,7 +289,8 @@ def p_error(p):
 
 # only for debugging
 
-data = '''SET X = 3+4 RIGHT
+data = '''SET X = 3+4 
+RIGHT X RIGHT X
 '''
 
 

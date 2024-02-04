@@ -95,19 +95,17 @@ class Performer(arcade.Sprite):
     def update(self, dir, num):
         step = 23.625
         m = 486.25
-        if self.center_x + step * num <= m and dir == 'RIGHT':
+        if dir == 'RIGHT':
             self.center_x += step * num
 
-        elif self.center_x - step * num > 0 and dir == 'LEFT':
+        elif dir == 'LEFT':
             self.center_x -= step * num
 
-        elif self.center_y + step * num <= m and dir == 'UP':
+        elif  dir == 'UP':
             self.center_y += step * num
 
-        elif self.center_y - step * num > 0 and dir == 'DOWN':
+        elif dir == 'DOWN':
             self.center_y -= step * num
-        else:
-            error_msg('попытка выйти за границы поля')
             
 
 class Polygon(arcade.Window):
