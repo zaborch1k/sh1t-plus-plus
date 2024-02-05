@@ -2,13 +2,16 @@
 
 class Interp:
     def __init__(self, prog):
-        print(prog)
+        print(prog) #
         self.prog = list(prog.values())
     
     def eval(self, expr):
         etype = expr[0]
+
         if etype == 'num':
-            return expr[1]
+            num = self.do_int(expr[1])
+            return num
+        
         elif etype == 'binop':
             if expr[1] == '+':
                 return self.eval(expr[2]) + self.eval(expr[3])
@@ -17,7 +20,11 @@ class Interp:
             elif expr[1] == '*':
                 return self.eval(expr[2]) * self.eval(expr[3])
             elif expr[1] == '/':
-                return float(self.eval(expr[2]) / self.eval(expr[3]))
+                return self.do_int(float(self.eval(expr[2]) / self.eval(expr[3])))
+            
+        elif etype == 'UMINUS':
+            return -1 * self.eval(expr[2])
+        
         elif etype == 'var':
             var = expr[1]
             if var in self.vars:
@@ -55,6 +62,11 @@ class Interp:
             return f'неверное значение параметра команды ({msg})' 
         else:
             return None
+    
+    def do_int(self, num):
+        if num % 1 == 0:
+            num = int(num)
+        return num
     
     def run(self):
         self.vars = {}
@@ -155,7 +167,7 @@ def get_data(data):
 
 
 def do_interp(data):
-    from lexparse_debug import parse
+    from lexparse_ddebug import parse
     i = None
     data = parse(data)
     i = Interp(data)

@@ -16,7 +16,7 @@ keywords = (
     'ENDREPEAT',
     'PROCEDURE',
     'ENDPROC',
-    'CALL',
+    'CALL'
 )
 
 tokens = keywords + (
@@ -25,7 +25,8 @@ tokens = keywords + (
     "ID",
     "LPAREN",
     "MINUS",
-    'NUMBER',
+    'INTEGER',
+    'FLOAT',
     "PLUS",
     "RPAREN",
     "TIMES",
@@ -51,17 +52,18 @@ t_RPAREN  = r"\)"
 t_WS = r'[^\n\S]+'
 t_NEWLINE = r'\n'
 
-def t_NUMBER(t):
-    r"-?\d+"
+def t_INTEGER(t):
+    r"\d+\s"
     t.value = int(t.value)
     return t
 
-error = None
+def t_FLOAT(t):
+    r"\d+(\.\d*)\s"
+    t.value = float(t.value)
+    return t
 
 def t_error(t):
-    global error
-    error = f"недопустимый символ '{t.value[0]}'"
-    t.lexer.skip(1)
+    t.lexer.error = t.value[0]
 
 
 # второй лексер, для обработки отступов
@@ -143,10 +145,12 @@ class IndentLex:
                     indent_stack.pop()
                     yield indent_tok
                 if indent_stack[-1] != indent:
-                    raise IndentationError("unindent") 
+                    global error
+                    error = 'неправильный уровень отступа'
             yield from tokens
 
 # парсер
+error = None   
             
 def check_nest_lvl():
     global nest_lvl
@@ -155,6 +159,12 @@ def check_nest_lvl():
     if nest_lvl > 3:
         err = True
     return err
+
+precedence = (
+    ('left', 'PLUS', 'MINUS'),
+    ('left', 'TIMES', 'DIVIDE'),
+    ('right', 'UMINUS')
+)
 
 
 def p_program(p):
@@ -167,7 +177,6 @@ def p_program(p):
         p[0][l] = p[1]
     elif len(p) == 3 and p[1]:
         p[1][l] = p[2]
-        print(p[1])
         p[0] = p[1]
     l += 1
 
@@ -180,7 +189,9 @@ def p_block(p):
 def p_groupstat(p):
     '''groupstat : groupstat statement
                  | '''
-    if len(p) == 3 and p[1]:
+    if len(p) == 4:
+        p[0] = 'EOF'
+    elif len(p) == 3 and p[1]:
         p[0] = (p[1], p[2])
     elif len(p) == 3 and p[2]:
         p[0] = p[2]
@@ -213,7 +224,7 @@ def p_command_ifblock_error1(p):
                | IFBLOCK UP error
                | IFBLOCK LEFT error'''
     global error
-    error = f'нет отступа после IFBLOCK {p[2]}'
+    error = f'неправильный уровень отступа после IFBLOCK {p[2]}'
 
 def p_command_ifblock_error2(p):
     '''command : IFBLOCK RIGHT block error
@@ -240,7 +251,7 @@ def p_command_repeat_error(p):
 def p_command_repeat_error1(p):
     '''command : REPEAT expr error'''
     global error
-    error = f'нет отступа после REPEAT'
+    error = f'неправильный уровень отступа после REPEAT'
 
 def p_command_repeat_error2(p):
     '''command : REPEAT expr block error
@@ -258,20 +269,21 @@ def p_command_procedure(p):
         p[0] = (p[1], p[2], p[3])
 
 def p_command_procedure_error(p):
-    '''command : PROCEDURE error'''
+    '''command : PROCEDURE error
+               | PROCEDURE '''
     global error
-    if p[2].value == '\n':
+    if len(p) == 2:
         error = f'отсутствует имя процедуры'
     else:
         error = f'недопустимое имя процедуры: {p[2].value}'
 
 def p_command_procedure_error1(p):
     '''command : PROCEDURE ID NEWLINE error
-               | PROCEDURE ID error'''
+               | PROCEDURE ID NEWLINE '''
     global error
-    error = f'нет отступа после PROCEDURE'
+    error = f'неправильный уровень отступа после PROCEDURE'
 
-def p_command_procedure_error2(p):
+def p_command_procedure_error3(p):
     '''command : PROCEDURE ID block error'''
     global error
     error = f'нет ENDPROC для PROCEDURE'
@@ -300,7 +312,10 @@ def p_command_dir_error(p):
                | UP error
                | DOWN error'''
     global error
-    error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
+    if p[2].value == '-':
+        error = f"ошибка в параметре для {p[1]}"
+    else:
+        error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
 
 
 def p_command_set(p):
@@ -308,17 +323,20 @@ def p_command_set(p):
     p[0] = (p[1], p[2], p[4])
 
 def p_command_set_error(p):
-    '''command : SET error '''
+    '''command : SET error'''
     global error
-    error = f"недопустимое имя переменной: '{p[2].value}'"
+    if p[2].value == '\n':
+        error = f"отсутствует имя переменной"
+    else:
+        error = f"недопустимое имя переменной: '{p[2].value}'"
 
 def p_command_set_error2(p):
-    '''command : SET ID error '''
+    '''command : SET ID error'''
     global error
     error = f"нет '=' в выражении SET"
 
 def p_command_set_error3(p):
-    '''command : SET ID EQUALS error '''
+    '''command : SET ID EQUALS error'''
     global error
     error = f"недопустимое значение для переменной: '{p[4].value}'"
 
@@ -326,12 +344,18 @@ def p_command_set_error3(p):
 def p_expr(p):
     '''expr : expr PLUS factor
             | expr MINUS factor
+            | expr factor
             | factor'''
     if len(p) == 2:
         p[0] = p[1]
+    elif len(p) == 3:
+        p[0] = ('binop', '+', p[1], p[2])
     else:
         p[0] = ('binop', p[2], p[1], p[3])
 
+def p_expr_uminus(p):
+    '''expr : MINUS expr %prec UMINUS'''
+    p[0] = ('UMINUS', '-', p[2])
 
 def p_factor(p):
     '''factor : factor TIMES fact
@@ -344,7 +368,8 @@ def p_factor(p):
 
 
 def p_fact_number(p):
-    "fact : NUMBER"
+    '''fact : INTEGER
+            | FLOAT'''
     p[0] = ("num", p[1])
 
 def p_fact_var(p):
@@ -359,30 +384,34 @@ def p_fact_paren(p):
 def p_error(p):
     global error
     if p:
-        error = f"недопустимая команда '{p.value}"
-    else:
-        pass
+        error = f"недопустимая команда '{p.value}'"
+    
 
 
 # only for debugging
 
-data = '''REPEAT 3
-RIGHT 3
-ENDREPEAT
-RIGHT 4
+data = '''RIGHT 1.0
 '''
 
 
 def parse(data):
-    data = data + '\n'
-    print(data)
-    global error, l, nest_lvl
+    global l, nest_lvl, error
     l = 0
     nest_lvl = 0
-    lexer = lex.lex(debug=True)
-    lexer = IndentLex(lexer)
-    parser = yacc.yacc(debug=True)
-    p = parser.parse(data, lexer=lexer, debug=True)
+    data = data + '\n'
+
+    try:
+        lexer1 = lex.lex()
+        lexer1.input(data)
+        for i in lexer1:
+            print(i)
+        lexer = IndentLex(lexer1)
+        if not error:
+            parser = yacc.yacc()
+            p = parser.parse(data, lexer=lexer, debug=True)
+    except lex.LexError:
+        error = f"недопустимый символ '{lexer1.error}'"
+       
     if error:
         return {'0': error}
     return p

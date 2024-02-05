@@ -24,7 +24,7 @@ def create_polygon():
     window = Polygon(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
 def run_polygon():
-    from interp_d import get_data ##
+    from interp_d import get_data
     global t, first, window
     mdata = None
     err = None
