@@ -4,7 +4,7 @@ import threading
 import tkinter as tk
 import tkinter.filedialog as tfd
 import tkinter.messagebox as tmb
-
+from time import sleep
 
 SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
@@ -45,6 +45,7 @@ def run_polygon():
     err = data[1]
     for i in mdata:
         window.performer.update(i[0], i[1])
+        window.after(1000)
     if err:
         error_msg(err)
     

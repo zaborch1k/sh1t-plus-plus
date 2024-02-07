@@ -3,6 +3,8 @@ import pycparser.ply.lex as lex
 import pycparser.ply.yacc as yacc
 from pycparser.ply.lex import LexToken
 
+import re
+
 # лексер
 keywords = (
     "SET",
@@ -159,6 +161,13 @@ def check_nest_lvl():
         err = True
     return err
 
+def check_error():
+    global error
+    if not error:
+        return None
+    else:
+        return 'continue'
+
 precedence = (
     ('left', 'PLUS', 'MINUS'),
     ('left', 'TIMES', 'DIVIDE'),
@@ -211,28 +220,26 @@ def p_command_ifblock(p):
         p[0] = (p[1], p[2], p[3])
 
 def p_command_ifblock_error(p):
-    '''command : IFBLOCK error'''
+    '''command : IFBLOCK error block ENDIF
+               | IFBLOCK error groupstat ENDIF'''
     global error
-    if p[2].value == '\n':
+    if p[2].value == '\n' or p[2].value == 'ENDIF':
         error = f"отстутствует параметр для {p[1]}"
     else:
         error = f"недопустимый параметр для IFBLOCK: {p[2].value}"
 
 def p_command_ifblock_error1(p):
-    '''command : IFBLOCK RIGHT error
-               | IFBLOCK DOWN error
-               | IFBLOCK UP error
+    '''command : IFBLOCK RIGHT error groupstat ENDIF
+               | IFBLOCK DOWN error groupstat ENDIF
+               | IFBLOCK UP error groupstat ENDIF
                | IFBLOCK LEFT error'''
     global error
-    error = f'неправильный уровень отступа после IFBLOCK {p[2]}'
-
-def p_command_ifblock_error2(p):
-    '''command : IFBLOCK RIGHT block error
-               | IFBLOCK DOWN block error
-               | IFBLOCK UP block error
-               | IFBLOCK LEFT block error'''
-    global error
-    error = f'нет ENDIF для IFBLOCK'
+    e = check_error()
+    if not e:
+        if p[3].value == '\n' or p[3].value == 'ENDIF' or not p[3]:
+            error = f"отстутствует блок кода после IFBLOCK"
+        else:
+            error = f'неправильный уровень отступа после IFBLOCK {p[2]}'
 
 
 def p_command_repeat(p):
@@ -244,24 +251,23 @@ def p_command_repeat(p):
         p[0] = (p[1], p[2], p[3])
 
 def p_command_repeat_error(p):
-    '''command : REPEAT error'''
+    '''command : REPEAT error block ENDREPEAT
+               | REPEAT error groupstat ENDREPEAT'''
     global error
-    if p[2].value == '\n':
+    if p[2].value == '\n' or p[2].value == 'ENDREPEAT':
         error = f"отстутствует параметр для {p[1]}"
     else:
         error = f'недопустимый параметр для {p[1]}: {p[2].value}'
 
 def p_command_repeat_error1(p):
-    '''command : REPEAT expr error
-               | REPEAT expr NEWLINE'''
+    '''command : REPEAT expr error groupstat ENDREPEAT'''
     global error
-    error = f'неправильный уровень отступа после REPEAT'
-
-def p_command_repeat_error2(p):
-    '''command : REPEAT expr block error
-               | REPEAT expr block'''
-    global error
-    error = f'нет ENDREPEAT для REPEAT'
+    e = check_error()
+    if not e:
+        if p[3].value == 'ENDREPEAT' or p[3].value == '\n' or not p[3]:
+            error = f'отстутствует блок кода после REPEAT'
+        else:
+            error = f'неправильный уровень отступа после REPEAT'
 
 
 def p_command_procedure(p):
@@ -273,24 +279,23 @@ def p_command_procedure(p):
         p[0] = (p[1], p[2], p[3])
 
 def p_command_procedure_error(p):
-    '''command : PROCEDURE error
-               | PROCEDURE '''
+    '''command : PROCEDURE error block ENDPROC
+               | PROCEDURE error groupstat ENDPROC '''
     global error
-    if len(p) == 2:
+    if p[2].value == 'ENDPROC' or p[2].value == '\n' or not p[2]:
         error = f'отсутствует имя процедуры'
     else:
         error = f'недопустимое имя процедуры: {p[2].value}'
 
 def p_command_procedure_error1(p):
-    '''command : PROCEDURE ID NEWLINE error
-               | PROCEDURE ID NEWLINE '''
+    '''command : PROCEDURE ID error groupstat ENDPROC'''
     global error
-    error = f'неправильный уровень отступа после PROCEDURE'
-
-def p_command_procedure_error2(p):
-    '''command : PROCEDURE ID block error'''
-    global error
-    error = f'нет ENDPROC для PROCEDURE'
+    e = check_error()
+    if not e:
+        if p[3].value == 'ENDPROC' or p[3].value == '\n' or not p[3]:
+            error = f'отстутствует блок кода после PROCEDURE'
+        else:
+            error = f'неправильный уровень отступа после PROCEDURE'
 
 
 def p_command_call(p):
@@ -319,10 +324,12 @@ def p_command_dir_error(p):
                | UP error
                | DOWN error'''
     global error
-    if p[2].value == '\n':
-        error = f"отстутствует параметр для {p[1]}"
-    else:
-        error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
+    e = check_error()
+    if not e:
+        if p[2].value == '\n':
+            error = f"отстутствует параметр для {p[1]}"
+        else:
+            error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
 
 
 def p_command_set(p):
@@ -346,8 +353,8 @@ def p_command_set_error2(p):
 def p_command_set_error3(p):
     '''command : SET ID EQUALS error'''
     global error
-    if p[2].value == '\n':
-        error = f"отстутствует название переменной"
+    if p[4].value == '\n':
+        error = f"отстутствует значение переменной"
     else:
         error = f"недопустимое значение для переменной: '{p[4].value}'"
 
@@ -387,17 +394,28 @@ def p_fact_paren(p):
     "fact : LPAREN expr RPAREN"
     p[0] = p[2]
 
-
+perror = None
 def p_error(p):
-    global error
+    global perror
     if p:
-        error = f"недопустимая команда '{p.value}'"
+        perror = f"недопустимая команда '{p.value}'"
 
 # only for debugging
 
-data = '''5
+data = '''IFBLOCK +
+ENDIF
 '''
 
+def ccount(s, word):
+    return len(re.findall(word, s))
+
+def check_no_end(start_stat, end_stat):
+    error = None
+    if start_stat[1] > end_stat[1]:
+        error = f'нет {end_stat[0]} для {start_stat[0]}'
+    elif start_stat[1] < end_stat[1]:
+        error = error = f'нет {start_stat[0]} для {end_stat[0]}'
+    return error
 
 def parse(data):
     global l, nest_lvl, error
@@ -406,15 +424,39 @@ def parse(data):
     nest_lvl = 0
     data = data + '\n'
 
+    repeat_count = ('REPEAT', ccount(data, '\\bREPEAT\\b'))
+    endrep_count = ('ENDREPEAT', ccount(data, '\\bENDREPEAT\\b'))
+
+    if_count = ('IFBLOCK', ccount(data, '\\bIFBLOCK\\b'))
+    endif_count = ('ENDIF', ccount(data, '\\bENDIF\\b'))
+
+    proc_count = ('PROCEDURE', ccount(data, '\\bPROCEDURE\\b'))
+    endproc_count = ('ENDPROC', ccount(data, '\\bENDPROC\\b'))
+
+    start_end = [[repeat_count, endrep_count], [if_count, endif_count], [proc_count, endproc_count]]
+
+    while True:
+        for i in start_end:
+            err = check_no_end(i[0], i[1])
+            if err:
+                break
+        break
+
     try:
         lexer1 = lex.lex()
         lexer = IndentLex(lexer1)
-        if not lexer.error:
+        if not lexer.error and not err:
             parser = yacc.yacc()
-            p = parser.parse(data, lexer=lexer)
+            p = parser.parse(data, lexer=lexer, debug=True)
+        else:
+            error = err
     except lex.LexError:
         error = f"недопустимый символ '{lexer1.error}'"
-       
+
     if error:
         return {'0': error}
+    elif perror:
+        return {'0': perror}
     return p
+
+print(parse(data))
