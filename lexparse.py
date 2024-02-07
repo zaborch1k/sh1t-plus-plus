@@ -213,7 +213,10 @@ def p_command_ifblock(p):
 def p_command_ifblock_error(p):
     '''command : IFBLOCK error'''
     global error
-    error = f"недопустимый параметр для IFBLOCK: {p[2].value}"
+    if p[2].value == '\n':
+        error = f"отстутствует параметр для {p[1]}"
+    else:
+        error = f"недопустимый параметр для IFBLOCK: {p[2].value}"
 
 def p_command_ifblock_error1(p):
     '''command : IFBLOCK RIGHT error
@@ -243,7 +246,10 @@ def p_command_repeat(p):
 def p_command_repeat_error(p):
     '''command : REPEAT error'''
     global error
-    error = f'недопустимый параметр для {p[1]}: {p[2].value}'
+    if p[2].value == '\n':
+        error = f"отстутствует параметр для {p[1]}"
+    else:
+        error = f'недопустимый параметр для {p[1]}: {p[2].value}'
 
 def p_command_repeat_error1(p):
     '''command : REPEAT expr error
@@ -294,7 +300,10 @@ def p_command_call(p):
 def p_command_call_error(p):
     '''command : CALL error'''
     global error
-    error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
+    if p[2].value == '\n':
+        error = f"отстутствует параметр для {p[1]}"
+    else:
+        error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
 
 
 def p_command_dir(p):
@@ -310,7 +319,10 @@ def p_command_dir_error(p):
                | UP error
                | DOWN error'''
     global error
-    error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
+    if p[2].value == '\n':
+        error = f"отстутствует параметр для {p[1]}"
+    else:
+        error = f"недопустимый параметр для {p[1]}: '{p[2].value}' "
 
 
 def p_command_set(p):
@@ -334,7 +346,10 @@ def p_command_set_error2(p):
 def p_command_set_error3(p):
     '''command : SET ID EQUALS error'''
     global error
-    error = f"недопустимое значение для переменной: '{p[4].value}'"
+    if p[2].value == '\n':
+        error = f"отстутствует название переменной"
+    else:
+        error = f"недопустимое значение для переменной: '{p[4].value}'"
 
 
 def p_expr(p):
