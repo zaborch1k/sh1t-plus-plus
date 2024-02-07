@@ -39,7 +39,6 @@ def run_polygon():
     window.performer.center_y = 250
 
     code = content_text.get(1.0, "end")
-    print(code)
     data = get_data(code)
     
     mdata = data[0]
