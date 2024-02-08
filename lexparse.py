@@ -193,14 +193,16 @@ def p_block(p):
     '''block : NEWLINE INDENT groupstat DEDENT'''
     p[0] = (p[3])
 
-
 def p_groupstat(p):
     '''groupstat : groupstat statement
                  | '''
+    global group
     if len(p) == 3 and p[1]:
-        p[0] = (p[1], p[2])
+        group = group + [p[2]]
+        p[0] = group
     elif len(p) == 3 and p[2]:
-        p[0] = p[2]
+        group = [p[2]]
+        p[0] = group
 
 
 def p_statement(p):
@@ -213,6 +215,8 @@ def p_command_ifblock(p):
                | IFBLOCK DOWN block ENDIF
                | IFBLOCK UP block ENDIF
                | IFBLOCK LEFT block ENDIF'''
+    global group
+    group = None
     err = check_nest_lvl()
     if err:
         p[0] = 'превышение максимального уровня вложенности (больше 3)'
@@ -244,6 +248,8 @@ def p_command_ifblock_error1(p):
 
 def p_command_repeat(p):
     '''command : REPEAT expr block ENDREPEAT'''
+    global group
+    group = None
     err = check_nest_lvl()
     if err:
         p[0] = 'превышение максимального уровня вложенности (больше 3)'
@@ -272,6 +278,8 @@ def p_command_repeat_error1(p):
 
 def p_command_procedure(p):
     '''command : PROCEDURE ID block ENDPROC'''
+    global group
+    group = None
     err = check_nest_lvl()
     if err:
         p[0] = 'превышение максимального уровня вложенности (больше 3)'
@@ -417,7 +425,8 @@ def check_no_end(start_stat, end_stat):
     return error
 
 def parse(data):
-    global l, nest_lvl, error, perror
+    global l, nest_lvl, error, perror, group
+    group = None
     perror = None
     error = None
     l = 0

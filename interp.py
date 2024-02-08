@@ -84,16 +84,12 @@ class Interp:
                     self.error = self.prog[0]
                     self.prog = []
                     op = None
-
-                elif isinstance(self.prog[self.pc][0], tuple):
-                    print('i am a tuple')
-                    old = self.prog[self.pc]
-                    for i in self.prog[self.pc]:
-                        pass
+                    
                 else:
                     instr = self.prog[self.pc]
                     print('INSTR:', instr) #
                     op = instr[0]
+
             except:
                 return (self.qmove, self.error)
 
@@ -132,18 +128,19 @@ class Interp:
                     if self.pos[0] == m:
                         marker = True
                 if instr[1] == 'LEFT':
-                    if self.pos[0] == 0:
+                    if self.pos[0] == 1:
                         marker = True
                 if instr[1] == 'UP':
                     if self.pos[1] == m:
                         marker = True
                 else:
-                    if self.pos[1] == 0:
+                    if self.pos[1] == 1:
                         marker = True
                 
                 if marker:
                     del self.prog[self.pc]
-                    self.prog.insert(self.pc+1, instr[2])
+                    for z in instr[2]:
+                        self.prog.insert(self.pc+1, z)
                     self.pc -= 1
 
             elif op == 'PROCEDURE':
@@ -155,9 +152,11 @@ class Interp:
                     self.error = self.check_range_error(val)
                 if not self.error:
                     del self.prog[self.pc]
-                    for i in range(0, self.eval(instr[1])):
-                        self.prog.insert(self.pc+1, instr[2])
-                        print(self.prog)
+
+                    for i in range(0, val):
+                        for z in instr[2]:
+                            self.prog.insert(self.pc+1, z)
+
                     self.pc -= 1
             
             if self.pos[0] > m or self.pos[1] > m or self.pos[0] < 0 or self.pos[1] <0 :
@@ -184,4 +183,3 @@ def do_interp(data):
     data = parse(data)
     i = Interp(data)
     return i.run()
-
