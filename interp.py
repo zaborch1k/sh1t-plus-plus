@@ -2,7 +2,6 @@
 
 class Interp:
     def __init__(self, prog):
-        print(prog) #
         self.prog = list(prog.values())
     
     def eval(self, expr):
@@ -73,12 +72,12 @@ class Interp:
         self.vars = {}
         self.error = None
         self.qmove = []
+        self.qpos = []
         self.pos = [11, 11]
         m = 21
         self.pc = 0
 
         while 1:
-            print('\nnew\n') ##
             try:
                 if isinstance(self.prog[0], str):
                     self.error = self.prog[0]
@@ -87,11 +86,10 @@ class Interp:
                     
                 else:
                     instr = self.prog[self.pc]
-                    print('INSTR:', instr) #
                     op = instr[0]
 
             except:
-                return (self.qmove, self.error)
+                return (self.qmove, self.error, self.qpos)
 
             if op == 'SET':
                 target = instr[1]
@@ -164,13 +162,10 @@ class Interp:
                 self.error = 'попытка выйти за границы поля'
                 
             if self.error:
-                print((self.qmove, self.error))
                 self.prog = {}
+            else:
+                self.qpos.append(self.pos)
             self.pc += 1
-            print('pos:', self.pos) #
-            print('queue to move:', self.qmove) #
-            print('vars:', self.vars) #
-
 
 def get_data(data):
     return do_interp(data)
@@ -178,7 +173,6 @@ def get_data(data):
 
 def do_interp(data):
     from lexparse import parse
-    print(data)
     i = None
     data = parse(data)
     i = Interp(data)

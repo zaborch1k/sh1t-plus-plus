@@ -404,7 +404,6 @@ def p_fact_paren(p):
 
 def p_error(p):
     global perror
-    print()
     if p:
         perror = f"недопустимая команда '{p.value}'"
 
