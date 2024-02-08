@@ -456,7 +456,7 @@ def parse(data):
         lexer = IndentLex(lexer1)
         if not lexer.error and not err:
             parser = yacc.yacc()
-            p = parser.parse(data, lexer=lexer, debug=True)
+            p = parser.parse(data, lexer=lexer, debug=False)
         else:
             error = err
     except lex.LexError:
