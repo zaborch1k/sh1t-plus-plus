@@ -84,6 +84,12 @@ class Interp:
                     self.error = self.prog[0]
                     self.prog = []
                     op = None
+
+                elif isinstance(self.prog[self.pc][0], tuple):
+                    print('i am a tuple')
+                    old = self.prog[self.pc]
+                    for i in self.prog[self.pc]:
+                        pass
                 else:
                     instr = self.prog[self.pc]
                     print('INSTR:', instr) #
@@ -151,6 +157,7 @@ class Interp:
                     del self.prog[self.pc]
                     for i in range(0, self.eval(instr[1])):
                         self.prog.insert(self.pc+1, instr[2])
+                        print(self.prog)
                     self.pc -= 1
             
             if self.pos[0] > m or self.pos[1] > m or self.pos[0] < 0 or self.pos[1] <0 :

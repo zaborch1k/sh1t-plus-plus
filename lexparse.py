@@ -394,16 +394,15 @@ def p_fact_paren(p):
     "fact : LPAREN expr RPAREN"
     p[0] = p[2]
 
-perror = None
 def p_error(p):
     global perror
+    print()
     if p:
         perror = f"недопустимая команда '{p.value}'"
 
 # only for debugging
 
-data = '''IFBLOCK +
-ENDIF
+data = '''
 '''
 
 def ccount(s, word):
@@ -418,7 +417,8 @@ def check_no_end(start_stat, end_stat):
     return error
 
 def parse(data):
-    global l, nest_lvl, error
+    global l, nest_lvl, error, perror
+    perror = None
     error = None
     l = 0
     nest_lvl = 0
@@ -459,4 +459,4 @@ def parse(data):
         return {'0': perror}
     return p
 
-print(parse(data))
+#print(parse(data))
