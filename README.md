@@ -5,6 +5,8 @@
 </picture>
 
 # **SH1T ++ (Sigmy Hotyat 1zuchyt' This!)**
+## A whole universe of satisfied customers!!!!!
+
 > *"If You A **Sigma**, Start Using This Right Now"* - Ilon ~~M~~Cask
 
 > *"That's how I became Sigma!"* - St1ve Hobs
