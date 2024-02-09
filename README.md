@@ -17,7 +17,7 @@
 
 > *"take away my facedbook((( I want this!"* - Mrk Zukatikberg
 
-> *My song "sh1t hits the fan" is about this lang. I don't understand anything in programm. I think it's cool. Wanna rap it again* - Em in em
+> *"My song "sh1t hits the fan" is about this lang. I don't understand anything in programm. I think it's cool. Wanna rap it again"* - Em in em
 
 > and others!
 
