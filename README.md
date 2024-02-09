@@ -28,3 +28,4 @@
 ## Still in doubt? Just ***try*** and become a ***sigma***
 
 <And now, in Russian (to become a sigma u ***must*** learn RUSSIAN)>
+Если мы все же сумели убедить Вас скачать эту программу, считаем себя обязанными пройти этот ~не~легкий путь вместе с вами. 
