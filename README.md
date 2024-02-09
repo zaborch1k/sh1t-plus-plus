@@ -11,6 +11,8 @@
 
 > *"That's how I became Sigma!"* - St1ve Hobs
 
+> *"Psychic spies from China try to steal your mind's elation; When I've tried this programm I forgot about all quotation."* - Red Hot Chili Peppers, origin vers. of "Californication"
+
 > *"I was fired from Open Ai because I suggested integrating this language there. But then they took me back because they realized that it still needed to be integrated!"* - S@m Altmn
 
 > *"I wanted to sell Microsoft to these guys to get this language!"* - **Bill Gate**way
