@@ -38,3 +38,4 @@ build/SH1T++/xref-SH1T++.html
 .venv/Lib/site-packages/pyglet/app/win32.py
 .venv/Lib/site-packages/pyglet/gl/__pycache__/lib.cpython-311.pyc
 .venv/Lib/site-packages/pyglet/gl/__pycache__/lib_wgl.cpython-311.pyc
+dist/.txt
