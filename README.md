@@ -7,7 +7,7 @@
 # **SH1T ++ (Sigmy Hotyat 1zuchyt' This!)**
 ## FAQ
 ### *- Why Do **I** Need to Use It Errday?*
-### - We have a whole universe of satisfied customers:
+### - 'Cause u won't be able to stop! Jokes aside. We have a whole universe of satisfied customers:
 
 > *"If You A **Sigma**, Start Using This Right Now"* - Ilon ~~M~~Cask
 
@@ -25,7 +25,7 @@
 
 > and others!
 
-## Still in doubt? ***Just try and become a sigma***
+## Still in doubt? Just ***try*** and become a ***sigma***
 
 
 *подробное объяснение, почему все хорошо и нет багов*
