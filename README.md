@@ -5,6 +5,6 @@
 </picture>
 
 # **SH1T ++ (Sigmy Hotyat 1zuchyt' This!)**
-## If You A Sigma, Start Using This Right Now
+> If You A *Sigma*, Start Using This Right Now (Ilon ~~M~~Cask)
 
 *подробное объяснение, почему все хорошо и нет багов*
