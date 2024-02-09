@@ -5,7 +5,7 @@
 </picture>
 
 # **SH1T ++ (Sigmy Hotyat 1zuchyt' This!)**
-## A whole universe of satisfied customers!!!!!
+## Why Do **You** Need to Use It Errday?
 
 > *"If You A **Sigma**, Start Using This Right Now"* - Ilon ~~M~~Cask
 
