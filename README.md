@@ -5,8 +5,9 @@
 </picture>
 
 # **SH1T ++ (Sigmy Hotyat 1zuchyt' This!)**
-## Why Do **You** Need to Use It Errday?
-## We have a whole universe of satisfied customers:
+## FAQ
+## *- Why Do **I** Need to Use It Errday?*
+## - We have a whole universe of satisfied customers:
 
 > *"If You A **Sigma**, Start Using This Right Now"* - Ilon ~~M~~Cask
 
@@ -23,6 +24,8 @@
 > *"My song "sh1t hits the fan" is about this lang. I don't understand anything in programm. I think it's cool. Wanna rap it again"* - Em in em
 
 > and others!
+
+## Still in doubt? ***Just try and become a sigma***
 
 
 *подробное объяснение, почему все хорошо и нет багов*
