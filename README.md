@@ -27,4 +27,4 @@
 
 ## Still in doubt? Just ***try*** and become a ***sigma***
 
-<And now, in Russian (to become a sigma u must learn RUSSIAN!)>
+<And now, in Russian (to become a sigma u ***must*** learn RUSSIAN)>
