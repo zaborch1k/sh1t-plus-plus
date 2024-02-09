@@ -27,5 +27,4 @@
 
 ## Still in doubt? Just ***try*** and become a ***sigma***
 
-
-*подробное объяснение, почему все хорошо и нет багов*
+<And now, in Russian (to become a sigma u must learn RUSSIAN!)>
